@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutanix AI Use Case Discovery Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Modern, accessible layout */
+        :root {
+            --bg: #f0f4f8;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --primary: #0f766e;
+            --primary-hover: #0d9488;
+            --primary-light: #ccfbf1;
+            --accent: #0891b2;
+            --border: #e2e8f0;
+            --focus: #0f766e;
+            --focus-ring: 0 0 0 3px rgba(15, 118, 110, 0.35);
+            --radius: 12px;
+            --radius-lg: 16px;
+            --space: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --font-base: 1.125rem;
+            --font-lg: 1.25rem;
+            --font-xl: 1.5rem;
+            --font-2xl: 1.875rem;
+            --font-3xl: 2.25rem;
+            --line-height: 1.6;
+            --touch-min: 44px;
+            --font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            font-size: var(--font-base);
+            line-height: var(--line-height);
+            color: var(--text);
+            background: var(--bg);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            padding: var(--space-xl) var(--space);
+            background: linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #0891b2 100%);
+            border-radius: var(--radius-lg);
+            color: #fff;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header h1 {
+            font-size: var(--font-3xl);
+            font-weight: 700;
+            margin-bottom: var(--space);
+            color: #fff;
+            letter-spacing: -0.02em;
+        }
+
+        .header .subtitle {
+            font-size: var(--font-lg);
+            color: rgba(255,255,255,0.9);
+        }
+
+        .section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: var(--shadow);
+        }
+
+        .section.hidden {
+            display: none;
+        }
+
+        .section h2 {
+            font-size: var(--font-xl);
+            font-weight: 600;
+            margin-bottom: var(--space-lg);
+            color: var(--text);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: var(--space);
+            font-size: var(--font-base);
+            color: var(--text);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: var(--space);
+            font-size: var(--font-base);
+            line-height: var(--line-height);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface);
+            color: var(--text);
+            min-height: var(--touch-min);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--focus);
+            box-shadow: var(--focus-ring);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%231a1a1a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 48px;
+        }
+
+        textarea.form-control {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space) var(--space-lg);
+            min-height: var(--touch-min);
+            font-size: var(--font-base);
+            font-weight: 600;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
+            font-family: inherit;
+        }
+
+        .btn:focus-visible {
+            outline: none;
+            box-shadow: var(--focus-ring);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: #adb5bd;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space);
+            margin-top: var(--space-lg);
+        }
+
+        .progress {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space);
+            margin-bottom: var(--space-xl);
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: var(--space);
+        }
+
+        .progress-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: var(--bg);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: var(--font-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-dot.active {
+            border-color: #1a1a1a;
+            background: var(--primary);
+            color: #1a1a1a;
+        }
+
+        .progress-dot.done {
+            border-color: #1a1a1a;
+            background: var(--success);
+            color: #1a1a1a;
+        }
+
+        .progress-line {
+            width: 48px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        .progress-line.done {
+            background: var(--success);
+        }
+
+        .discovery-intro {
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .discovery-questions-list {
+            margin: 0 0 1.5rem 1.25rem;
+            padding: 0;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .discovery-questions-list li {
+            margin-bottom: 0.75rem;
+        }
+
+        .discovery-actions {
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .question-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .question-card h3 {
+            font-size: var(--font-lg);
+            font-weight: 600;
+            margin-bottom: var(--space);
+            color: var(--text);
+        }
+
+        .question-card p {
+            font-size: var(--font-base);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-lg);
+        }
+
+        .checkbox-group, .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space);
+        }
+
+        .checkbox-item, .radio-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space);
+        }
+
+        .checkbox-item input, .radio-item input {
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            margin-top: 2px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .checkbox-item label, .radio-item label {
+            font-size: var(--font-base);
+            line-height: var(--line-height);
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        /* Results */
+        .results-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+        }
+
+        .results-header h2 {
+            font-size: var(--font-2xl);
+            margin-bottom: var(--space-lg);
+        }
+
+        .summary-stats {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .stat-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: var(--space-lg);
+            min-width: 160px;
+            text-align: center;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: var(--font-2xl);
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: var(--font-base);
+            color: var(--text-secondary);
+            margin-top: var(--space);
+        }
+
+        .result-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .result-card h3 {
+            font-size: var(--font-xl);
+            font-weight: 600;
+            margin-bottom: var(--space);
+            color: var(--primary);
+        }
+
+        .result-card h4 {
+            font-size: var(--font-lg);
+            font-weight: 600;
+            margin-top: var(--space-lg);
+            margin-bottom: var(--space);
+            color: var(--text);
+        }
+
+        .result-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .result-card ul li {
+            padding-left: 0;
+            margin-bottom: 0.5em;
+            position: relative;
+            font-size: var(--font-base);
+            line-height: 1.5;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .result-card ul li::before {
+            content: "▸";
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .use-case-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .use-case-title {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .use-case-title.btn-link {
+            background: none;
+            border: none;
+            padding: 0;
+            font: inherit;
+            color: var(--primary);
+            cursor: pointer;
+            text-align: left;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .use-case-title.btn-link:hover {
+            color: var(--primary-hover);
+        }
+
+        .results-toolbar {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space);
+            margin-bottom: var(--space-lg);
+            padding: var(--space);
+            background: var(--bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        .results-toolbar span {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .filter-btn {
+            padding: 0.4rem 0.75rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            font: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .filter-btn:hover {
+            background: var(--border);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        #resultsContent[data-filter="ml"] li[data-type="genai"] {
+            display: none;
+        }
+
+        #resultsContent[data-filter="genai"] li[data-type="ml"] {
+            display: none;
+        }
+
+        .uc-select {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        li.use-case-selected {
+            background: var(--primary-light);
+            border-radius: var(--radius);
+            padding: 0.35rem 0.5rem;
+            margin: 0.25rem 0;
+            border-left: 3px solid var(--primary);
+        }
+
+        li.use-case-selected .use-case-item {
+            font-weight: 500;
+        }
+
+        .badge-selected {
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.65rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2em 0.6em;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-current { background: var(--primary-light); color: var(--primary); }
+        .badge-near { background: #fef3c7; color: #b45309; }
+        .badge-long { background: #f1f5f9; color: var(--text-secondary); }
+        .badge-ml { background: #dbeafe; color: #1d4ed8; }
+        .badge-genai { background: #e0e7ff; color: #4338ca; }
+
+        .recommendation-box {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius);
+            padding: var(--space-lg);
+            margin-top: var(--space-lg);
+        }
+
+        .recommendation-box h3, .recommendation-box h4 {
+            color: var(--text);
+            margin-bottom: var(--space);
+        }
+
+        .recommendation-box p {
+            margin-bottom: var(--space);
+            font-size: var(--font-base);
+        }
+
+        .export-section {
+            margin-top: var(--space-xl);
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space);
+            justify-content: center;
+        }
+
+        #reportForExport .report-block { margin-bottom: 1.25em; }
+        #reportForExport .detail-block { margin: 0.75em 0; padding: 0.5em 0; border-bottom: 1px solid #e2e8f0; }
+        #reportForExport .detail-block h3 { margin-top: 0.5em; }
+
+        /* GenAI detail modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: var(--space);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            max-width: 560px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.96);
+            transition: transform 0.2s;
+        }
+
+        .modal-overlay.open .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: var(--space-lg) var(--space-xl);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: var(--space);
+        }
+
+        .modal-header h3 {
+            font-size: var(--font-lg);
+            font-weight: 600;
+            color: var(--text);
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            padding: 0.25rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            border-radius: var(--radius);
+        }
+
+        .modal-close:hover {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .modal-body {
+            padding: var(--space-xl);
+            overflow-y: auto;
+            max-height: calc(90vh - 140px);
+        }
+
+        .modal-body h4 {
+            font-size: var(--font-base);
+            font-weight: 600;
+            color: var(--primary);
+            margin: var(--space) 0 0.25rem 0;
+        }
+
+        .modal-body h4:first-child { margin-top: 0; }
+
+        .modal-body p {
+            margin: 0 0 var(--space);
+            font-size: var(--font-base);
+            line-height: 1.6;
+            color: var(--text);
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: var(--space); }
+            .header h1 { font-size: var(--font-2xl); }
+            .btn-group { flex-direction: column; }
+            .btn { width: 100%; }
+            .progress-dot { width: 36px; height: 36px; }
+            .progress-line { width: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Nutanix AI Use Case Discovery Tool</h1>
+            <p class="subtitle">Uncover vertical-specific AI opportunities for your accounts</p>
+        </header>
+
+        <nav class="progress" id="progress" aria-label="Progress">
+            <div class="progress-step">
+                <div class="progress-dot active" id="dot1" aria-current="step">1</div>
+            </div>
+            <div class="progress-line" id="line1"></div>
+            <div class="progress-step">
+                <div class="progress-dot" id="dot2">2</div>
+            </div>
+            <div class="progress-line" id="line2"></div>
+            <div class="progress-step">
+                <div class="progress-dot" id="dot3">3</div>
+            </div>
+            <div class="progress-line" id="line3"></div>
+            <div class="progress-step">
+                <div class="progress-dot" id="dot4">4</div>
+            </div>
+        </nav>
+
+        <section class="section" id="setupSection" aria-labelledby="setupTitle">
+            <h2 id="setupTitle">Client Information</h2>
+            <div class="form-group">
+                <label class="form-label" for="clientName">Client Name</label>
+                <input type="text" class="form-control" id="clientName" placeholder="Enter client name" autocomplete="organization">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="vertical">Industry Vertical</label>
+                <select class="form-control" id="vertical" aria-required="true">
+                    <option value="">Select industry vertical</option>
+                    <option value="financial">Financial Services &amp; Banking</option>
+                    <option value="healthcare">Healthcare &amp; Life Sciences</option>
+                    <option value="manufacturing">Manufacturing &amp; Industrial</option>
+                    <option value="retail">Retail &amp; E-Commerce</option>
+                    <option value="telecom">Telecommunications</option>
+                    <option value="energy">Energy &amp; Utilities</option>
+                    <option value="government">Government &amp; Public Sector</option>
+                    <option value="education">Education &amp; Research</option>
+                    <option value="technology">Technology &amp; Software</option>
+                    <option value="professional">Professional Services</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="companySize">Company Size</label>
+                <select class="form-control" id="companySize" aria-required="true">
+                    <option value="">Select company size</option>
+                    <option value="enterprise">Enterprise (10,000+ employees)</option>
+                    <option value="large">Large (1,000–10,000 employees)</option>
+                    <option value="mid">Mid-Market (250–1,000 employees)</option>
+                    <option value="small">Small (50–250 employees)</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary" id="btnStart">Start Discovery</button>
+            </div>
+        </section>
+
+        <section class="section hidden" id="discoveryQuestionsSection" aria-labelledby="discoveryQuestionsTitle">
+            <h2 id="discoveryQuestionsTitle">Discovery Questions</h2>
+            <p class="discovery-intro" id="discoveryQuestionsIntro">Use these vertical-specific questions to uncover details before the assessment.</p>
+            <ol class="discovery-questions-list" id="discoveryQuestionsList" aria-label="Discovery questions"></ol>
+            <div class="btn-group discovery-actions">
+                <button type="button" class="btn btn-secondary" id="btnDownloadQuestionsWord">Download as Word</button>
+                <button type="button" class="btn btn-secondary" id="btnDownloadQuestionsExcel">Download as Excel</button>
+                <button type="button" class="btn btn-primary" id="btnContinueToAssessment">Continue to Assessment</button>
+            </div>
+        </section>
+
+        <section class="section hidden" id="questionnaireSection" aria-labelledby="questionnaireTitle">
+            <h2 id="questionnaireTitle">AI Use Case Assessment</h2>
+            <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">Answer the following to tailor vertical-specific use cases for your client.</p>
+
+            <div class="question-card">
+                <h3>1. Current AI Initiatives</h3>
+                <p>What AI capabilities are they using or piloting?</p>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="ai1" value="Generative AI">
+                        <label for="ai1">Generative AI (content, customer service)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="ai2" value="Predictive Analytics">
+                        <label for="ai2">Predictive analytics and forecasting</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="ai3" value="Computer Vision">
+                        <label for="ai3">Computer vision (quality, security)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="ai4" value="NLP/Document">
+                        <label for="ai4">NLP and document automation</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="ai5" value="Fraud/Risk">
+                        <label for="ai5">Fraud detection and risk management</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="ai6" value="Recommendations">
+                        <label for="ai6">Recommendation engines</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="ai7" value="RPA/Automation">
+                        <label for="ai7">RPA with AI</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="ai8" value="None">
+                        <label for="ai8">None – exploring AI for the first time</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h3>2. Business Priorities</h3>
+                <p>Top priorities for the next 12–18 months (select all that apply).</p>
+                <div class="checkbox-group">
+                    <div class="checkbox-item"><input type="checkbox" id="bp1" value="Cost Reduction"><label for="bp1">Cost reduction and efficiency</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="bp2" value="Customer Experience"><label for="bp2">Customer experience</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="bp3" value="Revenue Growth"><label for="bp3">Revenue growth</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="bp4" value="Innovation"><label for="bp4">Innovation and product development</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="bp5" value="Risk/Compliance"><label for="bp5">Risk and compliance</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="bp6" value="Productivity"><label for="bp6">Employee productivity</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="bp7" value="Data-Driven"><label for="bp7">Data-driven decisions</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="bp8" value="Sustainability"><label for="bp8">Sustainability and ESG</label></div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h3>3. Pain Points</h3>
+                <p>Operational challenges they want to address.</p>
+                <div class="checkbox-group">
+                    <div class="checkbox-item"><input type="checkbox" id="pp1" value="Manual Processes"><label for="pp1">Manual, repetitive processes</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="pp2" value="Data Silos"><label for="pp2">Data silos</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="pp3" value="Customer Response"><label for="pp3">Slow customer response</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="pp4" value="Forecast Accuracy"><label for="pp4">Forecast accuracy</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="pp5" value="Compliance"><label for="pp5">Compliance burden</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="pp6" value="Talent"><label for="pp6">Talent shortage</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="pp7" value="Legacy"><label for="pp7">Legacy systems</label></div>
+                    <div class="checkbox-item"><input type="checkbox" id="pp8" value="Security"><label for="pp8">Cybersecurity</label></div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h3>4. Infrastructure Readiness</h3>
+                <div class="radio-group">
+                    <div class="radio-item"><input type="radio" name="infra" id="infra1" value="Advanced"><label for="infra1">Advanced – dedicated AI/GPU infrastructure</label></div>
+                    <div class="radio-item"><input type="radio" name="infra" id="infra2" value="Moderate"><label for="infra2">Moderate – cloud and some on-prem</label></div>
+                    <div class="radio-item"><input type="radio" name="infra" id="infra3" value="Basic"><label for="infra3">Basic – planning to upgrade</label></div>
+                    <div class="radio-item"><input type="radio" name="infra" id="infra4" value="Starting"><label for="infra4">Starting – no dedicated AI yet</label></div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h3>5. Data Maturity</h3>
+                <div class="radio-group">
+                    <div class="radio-item"><input type="radio" name="data" id="data1" value="Optimized"><label for="data1">Optimized – unified platform, strong governance</label></div>
+                    <div class="radio-item"><input type="radio" name="data" id="data2" value="Managed"><label for="data2">Managed – data lakes/warehouses, improving governance</label></div>
+                    <div class="radio-item"><input type="radio" name="data" id="data3" value="Developing"><label for="data3">Developing – some centralization, silos remain</label></div>
+                    <div class="radio-item"><input type="radio" name="data" id="data4" value="Initial"><label for="data4">Initial – fragmented data</label></div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h3>6. Investment Timeline</h3>
+                <div class="radio-group">
+                    <div class="radio-item"><input type="radio" name="timeline" id="time1" value="Immediate"><label for="time1">Immediate (0–3 months)</label></div>
+                    <div class="radio-item"><input type="radio" name="timeline" id="time2" value="Near-term"><label for="time2">Near-term (3–12 months)</label></div>
+                    <div class="radio-item"><input type="radio" name="timeline" id="time3" value="Medium-term"><label for="time3">Medium-term (12–24 months)</label></div>
+                    <div class="radio-item"><input type="radio" name="timeline" id="time4" value="Long-term"><label for="time4">Long-term (24+ months)</label></div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <h3>7. Additional Context</h3>
+                <p>Any other goals, constraints, or use cases to consider.</p>
+                <textarea class="form-control" id="additionalContext" placeholder="Optional notes…"></textarea>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary" id="btnBack">Back</button>
+                <button type="button" class="btn btn-primary" id="btnGenerate">Generate Recommendations</button>
+            </div>
+        </section>
+
+        <section class="section hidden" id="resultsSection" aria-labelledby="resultsTitle" aria-live="polite">
+            <div class="results-header">
+                <h2 id="resultsTitle">AI Use Case Recommendations</h2>
+                <div class="summary-stats" id="summaryStats"></div>
+            </div>
+            <div class="results-toolbar">
+                <span>Show:</span>
+                <button type="button" class="filter-btn active" data-filter="all" aria-pressed="true">All</button>
+                <button type="button" class="filter-btn" data-filter="ml">ML only</button>
+                <button type="button" class="filter-btn" data-filter="genai">GenAI only</button>
+                <span style="margin-left: auto;">Check boxes to highlight use cases in the report.</span>
+            </div>
+            <div id="resultsContent" data-filter="all"></div>
+            <div class="export-section">
+                <button type="button" class="btn btn-secondary" id="btnStartOver">Start New Assessment</button>
+                <button type="button" class="btn btn-primary" id="btnExportWord">Download Word</button>
+                <button type="button" class="btn btn-primary" id="btnExportExcel">Download Excel</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- GenAI use case detail modal -->
+    <div class="modal-overlay" id="genaiModal" role="dialog" aria-modal="true" aria-labelledby="genaiModalTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="genaiModalTitle">GenAI Use Case</h3>
+                <button type="button" class="modal-close" id="genaiModalClose" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body" id="genaiModalBody"></div>
+        </div>
+    </div>
+
+    <script src="use-cases.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" crossorigin="anonymous"></script>
+    <script>
+        (function() {
+            'use strict';
+
+            function escapeHtml(str) {
+                if (!str) return '';
+                var div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            function getLibrary() {
+                return window.USE_CASE_LIBRARY || {};
+            }
+
+            function getMeta() {
+                return window.VERTICAL_META || {};
+            }
+
+            function getGenAIDetails() {
+                return window.GENAI_DETAILS || {};
+            }
+
+            function openGenAIModal(vertical, detailId, title) {
+                var details = getGenAIDetails();
+                var byVertical = details[vertical];
+                var d = byVertical && byVertical[detailId];
+                var modal = document.getElementById('genaiModal');
+                var titleEl = document.getElementById('genaiModalTitle');
+                var bodyEl = document.getElementById('genaiModalBody');
+                if (!modal || !bodyEl) return;
+                titleEl.textContent = title || 'GenAI Use Case';
+                if (d && d.overview && d.architecture) {
+                    bodyEl.innerHTML = '<h4>Overview</h4><p>' + escapeHtml(d.overview) + '</p><h4>Implementation Architecture</h4><p>' + escapeHtml(d.architecture) + '</p>';
+                } else {
+                    bodyEl.innerHTML = '<p>No detailed overview available for this use case.</p>';
+                }
+                modal.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeGenAIModal() {
+                var modal = document.getElementById('genaiModal');
+                if (modal) modal.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+
+            function getFormData() {
+                var clientName = (document.getElementById('clientName').value || '').trim();
+                var vertical = document.getElementById('vertical').value;
+                var companySize = document.getElementById('companySize').value;
+                var currentAI = [];
+                for (var i = 1; i <= 8; i++) {
+                    var cb = document.getElementById('ai' + i);
+                    if (cb && cb.checked) currentAI.push(cb.value);
+                }
+                var priorities = [];
+                for (var i = 1; i <= 8; i++) {
+                    var cb = document.getElementById('bp' + i);
+                    if (cb && cb.checked) priorities.push(cb.value);
+                }
+                var painPoints = [];
+                for (var i = 1; i <= 8; i++) {
+                    var cb = document.getElementById('pp' + i);
+                    if (cb && cb.checked) painPoints.push(cb.value);
+                }
+                var infra = document.querySelector('input[name="infra"]:checked');
+                var data = document.querySelector('input[name="data"]:checked');
+                var timeline = document.querySelector('input[name="timeline"]:checked');
+                var additionalContext = (document.getElementById('additionalContext').value || '').trim();
+                return { clientName: clientName, vertical: vertical, companySize: companySize, currentAI: currentAI, priorities: priorities, painPoints: painPoints, infrastructure: infra ? infra.value : '', dataMaturity: data ? data.value : '', timeline: timeline ? timeline.value : '', additionalContext: additionalContext };
+            }
+
+            function showSection(id) {
+                ['setupSection', 'discoveryQuestionsSection', 'questionnaireSection', 'resultsSection'].forEach(function(sid) {
+                    var el = document.getElementById(sid);
+                    if (el) el.classList.toggle('hidden', sid !== id);
+                });
+            }
+
+            function setProgress(step) {
+                document.getElementById('dot1').classList.toggle('active', step === 1);
+                document.getElementById('dot1').classList.toggle('done', step > 1);
+                document.getElementById('line1').classList.toggle('done', step > 1);
+                document.getElementById('dot2').classList.toggle('active', step === 2);
+                document.getElementById('dot2').classList.toggle('done', step > 2);
+                document.getElementById('line2').classList.toggle('done', step > 2);
+                document.getElementById('dot3').classList.toggle('active', step === 3);
+                document.getElementById('dot3').classList.toggle('done', step > 3);
+                document.getElementById('line3').classList.toggle('done', step > 3);
+                document.getElementById('dot4').classList.toggle('active', step === 4);
+                document.getElementById('dot4').classList.toggle('done', step === 4);
+            }
+
+            function populateDiscoveryQuestions(vertical) {
+                var meta = window.VERTICAL_META && window.VERTICAL_META[vertical];
+                var questions = window.VERTICAL_DISCOVERY_QUESTIONS && window.VERTICAL_DISCOVERY_QUESTIONS[vertical];
+                var verticalName = meta && meta.name ? meta.name : vertical;
+                var titleEl = document.getElementById('discoveryQuestionsTitle');
+                var introEl = document.getElementById('discoveryQuestionsIntro');
+                var listEl = document.getElementById('discoveryQuestionsList');
+                if (titleEl) titleEl.textContent = 'Discovery Questions for ' + verticalName;
+                if (introEl) introEl.textContent = 'Use these vertical-specific questions to uncover details before the assessment.';
+                if (!listEl) return;
+                listEl.innerHTML = '';
+                if (questions && questions.length) {
+                    questions.forEach(function(q, i) {
+                        var li = document.createElement('li');
+                        li.textContent = q;
+                        listEl.appendChild(li);
+                    });
+                }
+            }
+
+            function downloadQuestionsWord(vertical) {
+                var meta = window.VERTICAL_META && window.VERTICAL_META[vertical];
+                var questions = window.VERTICAL_DISCOVERY_QUESTIONS && window.VERTICAL_DISCOVERY_QUESTIONS[vertical];
+                var verticalName = (meta && meta.name) ? meta.name : vertical;
+                if (!questions || !questions.length) { alert('No questions available for this vertical.'); return; }
+                var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">' +
+                    '<head><meta charset="utf-8"><title>Discovery Questions - ' + verticalName + '</title></head><body>' +
+                    '<h1>Discovery Questions for ' + verticalName + '</h1>' +
+                    '<p>Use these questions to uncover details before the assessment.</p>' +
+                    '<ol>';
+                questions.forEach(function(q) { html += '<li>' + q + '</li>'; });
+                html += '</ol></body></html>';
+                var blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
+                var a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'Discovery_Questions_' + (verticalName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '')) + '.doc';
+                a.click();
+                URL.revokeObjectURL(a.href);
+            }
+
+            function downloadQuestionsExcel(vertical) {
+                var meta = window.VERTICAL_META && window.VERTICAL_META[vertical];
+                var questions = window.VERTICAL_DISCOVERY_QUESTIONS && window.VERTICAL_DISCOVERY_QUESTIONS[vertical];
+                var verticalName = (meta && meta.name) ? meta.name : vertical;
+                if (!questions || !questions.length) { alert('No questions available for this vertical.'); return; }
+                if (typeof XLSX === 'undefined') { alert('Excel export is not available.'); return; }
+                var rows = [['#', 'Question']];
+                questions.forEach(function(q, i) { rows.push([i + 1, q]); });
+                var ws = XLSX.utils.aoa_to_sheet(rows);
+                var wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Discovery Questions');
+                XLSX.writeFile(wb, 'Discovery_Questions_' + (verticalName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '')) + '.xlsx');
+            }
+
+            document.body.addEventListener('click', function(e) {
+                var btn = e.target.closest('.use-case-title.btn-link');
+                if (btn && btn.dataset.vertical && btn.dataset.detailId) {
+                    e.preventDefault();
+                    openGenAIModal(btn.dataset.vertical, btn.dataset.detailId, (btn.dataset.title || btn.textContent || '').trim());
+                }
+            });
+
+            document.getElementById('genaiModalClose').addEventListener('click', closeGenAIModal);
+            document.getElementById('genaiModal').addEventListener('click', function(e) {
+                var overlay = document.getElementById('genaiModal');
+                if (overlay && e.target === overlay) closeGenAIModal();
+            });
+
+            document.body.addEventListener('click', function(e) {
+                var filterBtn = e.target.closest('.filter-btn');
+                if (filterBtn && filterBtn.dataset.filter) {
+                    var f = filterBtn.dataset.filter;
+                    document.querySelectorAll('.results-toolbar .filter-btn').forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+                    filterBtn.classList.add('active');
+                    filterBtn.setAttribute('aria-pressed', 'true');
+                    var content = document.getElementById('resultsContent');
+                    if (content) content.setAttribute('data-filter', f);
+                }
+            });
+
+            document.body.addEventListener('change', function(e) {
+                if (e.target.classList && e.target.classList.contains('uc-select') && e.target.dataset.ucKey) {
+                    var key = e.target.dataset.ucKey;
+                    if (!window._selectedUseCases) window._selectedUseCases = new Set();
+                    if (e.target.checked) window._selectedUseCases.add(key);
+                    else window._selectedUseCases.delete(key);
+                    var li = e.target.closest('li');
+                    if (li) li.classList.toggle('use-case-selected', e.target.checked);
+                }
+            });
+
+            document.getElementById('btnStart').addEventListener('click', function() {
+                var name = document.getElementById('clientName').value.trim();
+                var vert = document.getElementById('vertical').value;
+                var size = document.getElementById('companySize').value;
+                if (!name || !vert || !size) {
+                    alert('Please fill in client name, industry vertical, and company size.');
+                    return;
+                }
+                populateDiscoveryQuestions(vert);
+                showSection('discoveryQuestionsSection');
+                setProgress(2);
+                var first = document.getElementById('discoveryQuestionsTitle');
+                if (first) first.setAttribute('tabindex', '-1'), first.focus();
+                window.scrollTo(0, 0);
+            });
+
+            document.getElementById('btnContinueToAssessment').addEventListener('click', function() {
+                showSection('questionnaireSection');
+                setProgress(3);
+                var firstQ = document.querySelector('#questionnaireSection h2, #questionnaireSection .question-card');
+                if (firstQ) firstQ.setAttribute('tabindex', '-1'), firstQ.focus();
+                window.scrollTo(0, 0);
+            });
+
+            document.getElementById('btnDownloadQuestionsWord').addEventListener('click', function() {
+                var vert = document.getElementById('vertical').value;
+                if (!vert) return;
+                downloadQuestionsWord(vert);
+            });
+
+            document.getElementById('btnDownloadQuestionsExcel').addEventListener('click', function() {
+                var vert = document.getElementById('vertical').value;
+                if (!vert) return;
+                downloadQuestionsExcel(vert);
+            });
+
+            document.getElementById('btnBack').addEventListener('click', function() {
+                showSection('discoveryQuestionsSection');
+                setProgress(2);
+                window.scrollTo(0, 0);
+            });
+
+            function ucKey(vertical, title) {
+                return (vertical || '') + '|' + (title || '');
+            }
+
+            function getReportSections(data) {
+                var lib = getLibrary();
+                var genaiDetails = getGenAIDetails();
+                var vertical = data.vertical;
+                var useCases = lib[vertical] || [];
+                var sel = window._selectedUseCases || new Set();
+                var all = useCases.slice();
+                var selected = [];
+                var unselected = [];
+                all.forEach(function(u) {
+                    var key = ucKey(vertical, u.title);
+                    var detail = (u.type === 'genai' && u.detailId && genaiDetails[vertical]) ? genaiDetails[vertical][u.detailId] : null;
+                    if (sel.has(key)) {
+                        selected.push({
+                            title: u.title,
+                            category: u.category,
+                            overview: detail ? detail.overview : null,
+                            architecture: detail ? detail.architecture : null
+                        });
+                    } else {
+                        unselected.push({ title: u.title, category: u.category });
+                    }
+                });
+                return { selected: selected, unselected: unselected };
+            }
+
+            function renderUseCaseLi(u) {
+                var key = ucKey(u.vertical, u.title);
+                var typeBadge = (u.type === 'genai') ? '<span class="badge badge-genai">GenAI</span>' : '<span class="badge badge-ml">ML</span>';
+                var titleEl;
+                if (u.type === 'genai' && u.detailId) {
+                    titleEl = '<button type="button" class="use-case-title btn-link" data-vertical="' + escapeHtml(u.vertical || '') + '" data-detail-id="' + escapeHtml(u.detailId) + '" data-title="' + escapeHtml(u.title) + '">' + escapeHtml(u.title) + '</button>';
+                } else if (u.type === 'genai') {
+                    titleEl = '<span class="use-case-title">' + escapeHtml(u.title) + '</span>';
+                } else {
+                    titleEl = '<span class="use-case-title">' + escapeHtml(u.title) + '</span>';
+                }
+                if (!window._selectedUseCases) window._selectedUseCases = new Set();
+                var checked = window._selectedUseCases.has(key) ? ' checked' : '';
+                var selectedClass = window._selectedUseCases.has(key) ? ' use-case-selected' : '';
+                return '<li class="' + selectedClass + '" data-type="' + escapeHtml(u.type || 'ml') + '" data-uc-key="' + escapeHtml(key) + '"><span class="use-case-item"><input type="checkbox" class="uc-select" data-uc-key="' + escapeHtml(key) + '" title="Select to highlight in report"' + checked + '>' + typeBadge + titleEl + '</span></li>';
+            }
+
+            function buildResultsHTML(data) {
+                var lib = getLibrary();
+                var meta = getMeta();
+                var vertical = data.vertical;
+                var useCases = lib[vertical];
+                var vm = meta[vertical] || { name: vertical, drivers: '', nutanixValue: '' };
+
+                if (!useCases || !useCases.length) {
+                    return '<p>No use cases found for this vertical.</p>';
+                }
+
+                var current = useCases.filter(function(u) { return u.category === 'current'; });
+                var nearTerm = useCases.filter(function(u) { return u.category === 'near-term'; });
+                var longTerm = useCases.filter(function(u) { return u.category === 'long-term'; });
+
+                [current, nearTerm, longTerm].forEach(function(arr) {
+                    arr.forEach(function(u) { u.vertical = vertical; });
+                });
+
+                var companySizeLabel = data.companySize ? (data.companySize.charAt(0).toUpperCase() + data.companySize.slice(1)) : '';
+
+                var html = '<div class="result-card"><h3>Client Profile</h3>';
+                html += '<p><strong>Client:</strong> ' + escapeHtml(data.clientName) + '</p>';
+                html += '<p><strong>Industry:</strong> ' + escapeHtml(vm.name) + '</p>';
+                html += '<p><strong>Company Size:</strong> ' + escapeHtml(companySizeLabel) + '</p>';
+                html += '<p><strong>Infrastructure:</strong> ' + escapeHtml(data.infrastructure) + '</p>';
+                html += '<p><strong>Data Maturity:</strong> ' + escapeHtml(data.dataMaturity) + '</p>';
+                html += '<p><strong>Timeline:</strong> ' + escapeHtml(data.timeline) + '</p></div>';
+
+                html += '<div class="result-card"><h3>Current AI Use Cases <span class="badge badge-current">Current</span></h3>';
+                html += '<p>Industry-relevant use cases commonly in production today (' + current.length + '). <strong>Click GenAI use cases for details.</strong></p><ul>';
+                current.forEach(function(u) { html += renderUseCaseLi(u); });
+                html += '</ul></div>';
+
+                html += '<div class="result-card"><h3>Near-Term Opportunities (3–12 months) <span class="badge badge-near">Near-term</span></h3>';
+                html += '<p>High-value opportunities for the next 12 months (' + nearTerm.length + '):</p><ul>';
+                nearTerm.forEach(function(u) { html += renderUseCaseLi(u); });
+                html += '</ul></div>';
+
+                html += '<div class="result-card"><h3>Long-Term Vision (12–24+ months) <span class="badge badge-long">Long-term</span></h3>';
+                html += '<p>Strategic use cases for competitive advantage (' + longTerm.length + '):</p><ul>';
+                longTerm.forEach(function(u) { html += renderUseCaseLi(u); });
+                html += '</ul></div>';
+
+                html += '<div class="result-card"><h3>Priorities &amp; Pain Points</h3>';
+                html += '<p><strong>Priorities:</strong></p><ul>';
+                (data.priorities || []).forEach(function(p) { html += '<li>' + escapeHtml(p) + '</li>'; });
+                html += '</ul><h4>Pain Points</h4><ul>';
+                (data.painPoints || []).forEach(function(p) { html += '<li>' + escapeHtml(p) + '</li>'; });
+                html += '</ul></div>';
+
+                html += '<div class="recommendation-box"><h3>Why This Matters for ' + escapeHtml(vm.name) + '</h3>';
+                html += '<p>' + escapeHtml(vm.drivers) + '</p>';
+                html += '<h4>Nutanix Platform &amp; Product Value</h4>';
+                if (vm.platformValue) html += '<p><strong>Platform:</strong> ' + escapeHtml(vm.platformValue) + '</p>';
+                if (vm.nus) html += '<p><strong>Nutanix Unified Storage (NUS):</strong> ' + escapeHtml(vm.nus) + '</p>';
+                if (vm.nkp) html += '<p><strong>Nutanix Kubernetes Platform (NKP):</strong> ' + escapeHtml(vm.nkp) + '</p>';
+                if (vm.nai) html += '<p><strong>Nutanix Enterprise AI (NAI):</strong> ' + escapeHtml(vm.nai) + '</p>';
+                if (vm.ndb) html += '<p><strong>Nutanix Database Service (NDB):</strong> ' + escapeHtml(vm.ndb) + '</p>';
+                if (!vm.platformValue && !vm.nus && !vm.nkp && !vm.nai && !vm.ndb) html += '<p>' + escapeHtml(vm.nutanixValue || '') + '</p>';
+                html += '</div>';
+
+                if (data.additionalContext) {
+                    html += '<div class="result-card"><h3>Additional Context</h3><p>' + escapeHtml(data.additionalContext) + '</p></div>';
+                }
+
+                return html;
+            }
+
+            function buildReportPlainText(data) {
+                var meta = getMeta();
+                var vm = meta[data.vertical] || { name: data.vertical, drivers: '', nutanixValue: '' };
+                var sections = getReportSections(data);
+
+                var lines = [];
+                lines.push('NUTANIX AI USE CASE DISCOVERY REPORT');
+                lines.push('=====================================');
+                lines.push('Client: ' + data.clientName);
+                lines.push('Industry: ' + vm.name);
+                lines.push('Company Size: ' + data.companySize);
+                lines.push('Date: ' + new Date().toLocaleDateString());
+                lines.push('');
+
+                if (sections.selected.length > 0) {
+                    lines.push('--- SELECTED USE CASES – DETAILED OVERVIEWS ---');
+                    lines.push('');
+                    sections.selected.forEach(function(s) {
+                        lines.push(s.title);
+                        lines.push('');
+                        if (s.overview) {
+                            lines.push('Overview:');
+                            lines.push(s.overview);
+                            lines.push('');
+                        }
+                        if (s.architecture) {
+                            lines.push('Implementation Architecture:');
+                            lines.push(s.architecture);
+                            lines.push('');
+                        }
+                        if (!s.overview && !s.architecture) lines.push('(No detailed overview available.)');
+                        lines.push('---');
+                        lines.push('');
+                    });
+                }
+
+                lines.push('--- CLIENT PROFILE ---');
+                lines.push('Infrastructure: ' + data.infrastructure);
+                lines.push('Data Maturity: ' + data.dataMaturity);
+                lines.push('Timeline: ' + data.timeline);
+                lines.push('');
+                lines.push('--- PRIORITIES ---');
+                (data.priorities || []).forEach(function(p) { lines.push('• ' + p); });
+                lines.push('');
+                lines.push('--- PAIN POINTS ---');
+                (data.painPoints || []).forEach(function(p) { lines.push('• ' + p); });
+                lines.push('');
+                lines.push('--- BUSINESS DRIVERS ---');
+                lines.push(vm.drivers);
+                lines.push('');
+                lines.push('--- NUTANIX PLATFORM & PRODUCT VALUE ---');
+                if (vm.platformValue) { lines.push('Platform: ' + vm.platformValue); lines.push(''); }
+                if (vm.nus) { lines.push('NUS (Nutanix Unified Storage): ' + vm.nus); lines.push(''); }
+                if (vm.nkp) { lines.push('NKP (Nutanix Kubernetes Platform): ' + vm.nkp); lines.push(''); }
+                if (vm.nai) { lines.push('NAI (Nutanix Enterprise AI): ' + vm.nai); lines.push(''); }
+                if (vm.ndb) { lines.push('NDB (Nutanix Database Service): ' + vm.ndb); lines.push(''); }
+                if (!vm.platformValue && !vm.nus && !vm.nkp && !vm.nai && !vm.ndb) lines.push(vm.nutanixValue || '');
+                if (data.additionalContext) {
+                    lines.push('');
+                    lines.push('--- ADDITIONAL CONTEXT ---');
+                    lines.push(data.additionalContext);
+                }
+
+                if (sections.unselected.length > 0) {
+                    lines.push('');
+                    lines.push('=== APPENDIX: OTHER USE CASES ===');
+                    lines.push('');
+                    var cur = sections.unselected.filter(function(u) { return u.category === 'current'; });
+                    var near = sections.unselected.filter(function(u) { return u.category === 'near-term'; });
+                    var lng = sections.unselected.filter(function(u) { return u.category === 'long-term'; });
+                    if (cur.length) { lines.push('Current:'); cur.forEach(function(u) { lines.push('• ' + u.title); }); lines.push(''); }
+                    if (near.length) { lines.push('Near-Term:'); near.forEach(function(u) { lines.push('• ' + u.title); }); lines.push(''); }
+                    if (lng.length) { lines.push('Long-Term:'); lng.forEach(function(u) { lines.push('• ' + u.title); }); lines.push(''); }
+                }
+
+                lines.push('');
+                lines.push('---');
+                lines.push('Generated by Nutanix AI Use Case Discovery Tool');
+                return lines.join('\n');
+            }
+
+            function buildReportRichHTML(data) {
+                var meta = getMeta();
+                var vm = meta[data.vertical] || { name: data.vertical, drivers: '', nutanixValue: '' };
+                var sections = getReportSections(data);
+                var companySizeLabel = data.companySize ? (data.companySize.charAt(0).toUpperCase() + data.companySize.slice(1)) : '';
+
+                var html = '<h1>Nutanix AI Use Case Discovery Report</h1>';
+                html += '<p class="report-block"><strong>Client:</strong> ' + escapeHtml(data.clientName) + ' &nbsp;|&nbsp; <strong>Industry:</strong> ' + escapeHtml(vm.name) + ' &nbsp;|&nbsp; <strong>Company Size:</strong> ' + escapeHtml(companySizeLabel) + ' &nbsp;|&nbsp; ' + new Date().toLocaleDateString() + '</p>';
+
+                if (sections.selected.length > 0) {
+                    html += '<h2>Selected Use Cases – Detailed Overviews</h2>';
+                    sections.selected.forEach(function(s) {
+                        html += '<div class="detail-block"><h3>' + escapeHtml(s.title) + '</h3>';
+                        if (s.overview) html += '<p><strong>Overview:</strong> ' + escapeHtml(s.overview) + '</p>';
+                        if (s.architecture) html += '<p><strong>Implementation Architecture:</strong> ' + escapeHtml(s.architecture) + '</p>';
+                        if (!s.overview && !s.architecture) html += '<p><em>(No detailed overview available.)</em></p>';
+                        html += '</div>';
+                    });
+                }
+
+                html += '<h2>Client Profile</h2><p class="report-block"><strong>Infrastructure:</strong> ' + escapeHtml(data.infrastructure) + ' &nbsp;|&nbsp; <strong>Data Maturity:</strong> ' + escapeHtml(data.dataMaturity) + ' &nbsp;|&nbsp; <strong>Timeline:</strong> ' + escapeHtml(data.timeline) + '</p>';
+                html += '<h3>Priorities</h3><ul>';
+                (data.priorities || []).forEach(function(p) { html += '<li>' + escapeHtml(p) + '</li>'; });
+                html += '</ul><h3>Pain Points</h3><ul>';
+                (data.painPoints || []).forEach(function(p) { html += '<li>' + escapeHtml(p) + '</li>'; });
+                html += '</ul>';
+                html += '<h2>Why This Matters</h2><p class="report-block">' + escapeHtml(vm.drivers) + '</p>';
+                html += '<h2>Nutanix Platform &amp; Product Value</h2>';
+                if (vm.platformValue) html += '<p class="report-block"><strong>Platform:</strong> ' + escapeHtml(vm.platformValue) + '</p>';
+                if (vm.nus) html += '<p class="report-block"><strong>Nutanix Unified Storage (NUS):</strong> ' + escapeHtml(vm.nus) + '</p>';
+                if (vm.nkp) html += '<p class="report-block"><strong>Nutanix Kubernetes Platform (NKP):</strong> ' + escapeHtml(vm.nkp) + '</p>';
+                if (vm.nai) html += '<p class="report-block"><strong>Nutanix Enterprise AI (NAI):</strong> ' + escapeHtml(vm.nai) + '</p>';
+                if (vm.ndb) html += '<p class="report-block"><strong>Nutanix Database Service (NDB):</strong> ' + escapeHtml(vm.ndb) + '</p>';
+                if (!vm.platformValue && !vm.nus && !vm.nkp && !vm.nai && !vm.ndb) html += '<p class="report-block">' + escapeHtml(vm.nutanixValue || '') + '</p>';
+                if (data.additionalContext) html += '<h2>Additional Context</h2><p class="report-block">' + escapeHtml(data.additionalContext) + '</p>';
+
+                if (sections.unselected.length > 0) {
+                    html += '<h2>Appendix: Other Use Cases</h2>';
+                    var cur = sections.unselected.filter(function(u) { return u.category === 'current'; });
+                    var near = sections.unselected.filter(function(u) { return u.category === 'near-term'; });
+                    var lng = sections.unselected.filter(function(u) { return u.category === 'long-term'; });
+                    if (cur.length) { html += '<h3>Current</h3><ul>'; cur.forEach(function(u) { html += '<li>' + escapeHtml(u.title) + '</li>'; }); html += '</ul>'; }
+                    if (near.length) { html += '<h3>Near-Term</h3><ul>'; near.forEach(function(u) { html += '<li>' + escapeHtml(u.title) + '</li>'; }); html += '</ul>'; }
+                    if (lng.length) { html += '<h3>Long-Term</h3><ul>'; lng.forEach(function(u) { html += '<li>' + escapeHtml(u.title) + '</li>'; }); html += '</ul>'; }
+                }
+
+                return html;
+            }
+
+            document.getElementById('btnGenerate').addEventListener('click', function() {
+                var data = getFormData();
+                if (!data.vertical) {
+                    alert('Please select an industry vertical.');
+                    return;
+                }
+                if (!data.priorities.length) {
+                    alert('Please select at least one business priority.');
+                    return;
+                }
+                var infra = document.querySelector('input[name="infra"]:checked');
+                var dataM = document.querySelector('input[name="data"]:checked');
+                var timeline = document.querySelector('input[name="timeline"]:checked');
+                if (!infra || !dataM || !timeline) {
+                    alert('Please answer Infrastructure, Data Maturity, and Investment Timeline.');
+                    return;
+                }
+
+                var lib = getLibrary();
+                var useCases = lib[data.vertical] || [];
+                var current = useCases.filter(function(u) { return u.category === 'current'; });
+                var nearTerm = useCases.filter(function(u) { return u.category === 'near-term'; });
+                var longTerm = useCases.filter(function(u) { return u.category === 'long-term'; });
+
+                var summaryHTML = '<div class="stat-box"><span class="stat-value">' + current.length + '</span><span class="stat-label">Current Use Cases</span></div>';
+                summaryHTML += '<div class="stat-box"><span class="stat-value">' + nearTerm.length + '</span><span class="stat-label">Near-Term</span></div>';
+                summaryHTML += '<div class="stat-box"><span class="stat-value">' + longTerm.length + '</span><span class="stat-label">Long-Term</span></div>';
+                document.getElementById('summaryStats').innerHTML = summaryHTML;
+                document.getElementById('resultsContent').innerHTML = buildResultsHTML(data);
+
+                window._lastReportData = data;
+                showSection('resultsSection');
+                setProgress(4);
+                var resultsTitle = document.getElementById('resultsTitle');
+                if (resultsTitle) { resultsTitle.setAttribute('tabindex', '-1'); resultsTitle.focus(); }
+                window.scrollTo(0, 0);
+            });
+
+            document.getElementById('btnStartOver').addEventListener('click', function() {
+                showSection('setupSection');
+                setProgress(1);
+                window._selectedUseCases = new Set();
+                document.getElementById('clientName').value = '';
+                document.getElementById('vertical').value = '';
+                document.getElementById('companySize').value = '';
+                document.getElementById('additionalContext').value = '';
+                document.querySelectorAll('input[type="checkbox"]').forEach(function(cb) { cb.checked = false; });
+                document.querySelectorAll('input[type="radio"]').forEach(function(r) { r.checked = false; });
+                window._lastReportData = null;
+                window._selectedUseCases = new Set();
+                window.scrollTo(0, 0);
+            });
+
+            function getSafeFilename() {
+                var data = window._lastReportData;
+                var name = (data && data.clientName) ? data.clientName.replace(/\s+/g, '_').replace(/[^\w\-_]/g, '') : 'Report';
+                return name + '_AI_Discovery';
+            }
+
+            document.getElementById('btnExportWord').addEventListener('click', function() {
+                var data = window._lastReportData;
+                if (!data) { alert('Generate a report first.'); return; }
+
+                var bodyHtml = buildReportRichHTML(data);
+                var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>AI Use Case Discovery Report</title>';
+                html += '<style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.5;color:#1e293b;}';
+                html += 'h1{font-size:22pt;margin:0 0 0.5em 0;} h2{font-size:16pt;margin:1em 0 0.35em 0;} h3{font-size:13pt;margin:0.75em 0 0.25em 0;}';
+                html += '.report-block{margin-bottom:1em;} .detail-block{margin:0.75em 0;padding:0.5em 0;border-bottom:1px solid #e2e8f0;} .detail-block h3{margin-top:0.5em;}';
+                html += 'ul{margin:0.35em 0;} li{margin:0.2em 0;}</style></head><body>' + bodyHtml + '</body></html>';
+                var blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = getSafeFilename() + '.doc';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+
+            document.getElementById('btnExportExcel').addEventListener('click', function() {
+                var data = window._lastReportData;
+                if (!data) { alert('Generate a report first.'); return; }
+
+                var lib = getLibrary()[data.vertical] || [];
+                var meta = getMeta()[data.vertical] || {};
+                var genaiDetails = getGenAIDetails();
+                var current = lib.filter(function(u) { return u.category === 'current'; });
+                var near = lib.filter(function(u) { return u.category === 'near-term'; });
+                var long = lib.filter(function(u) { return u.category === 'long-term'; });
+                var v = data.vertical;
+                var sel = window._selectedUseCases || new Set();
+
+                function detailFor(u) {
+                    if (!sel.has(ucKey(v, u.title))) return '';
+                    var d = (u.type === 'genai' && u.detailId && genaiDetails[v]) ? genaiDetails[v][u.detailId] : null;
+                    if (!d) return '(No detailed overview available.)';
+                    return (d.overview || '') + '\n\nImplementation Architecture: ' + (d.architecture || '');
+                }
+
+                var XLSX = window.XLSX;
+                if (!XLSX) { alert('Excel export library not loaded.'); return; }
+
+                var rows = [
+                    ['Nutanix AI Use Case Discovery Report', ''],
+                    ['Client', data.clientName],
+                    ['Industry', meta.name || data.vertical],
+                    ['Company Size', data.companySize],
+                    ['Date', new Date().toLocaleDateString()],
+                    [],
+                    ['Current Use Cases', 'Details (selected only)'],
+                    ...current.map(function(u) { return [u.title, detailFor(u)]; }),
+                    [],
+                    ['Near-Term Opportunities', 'Details (selected only)'],
+                    ...near.map(function(u) { return [u.title, detailFor(u)]; }),
+                    [],
+                    ['Long-Term Vision', 'Details (selected only)'],
+                    ...long.map(function(u) { return [u.title, detailFor(u)]; }),
+                    [],
+                    ['Business Drivers', meta.drivers || ''],
+                    [],
+                    ['Nutanix Platform & Product Value', ''],
+                    ['Platform', meta.platformValue || meta.nutanixValue || ''],
+                    ['NUS (Nutanix Unified Storage)', meta.nus || ''],
+                    ['NKP (Nutanix Kubernetes Platform)', meta.nkp || ''],
+                    ['NAI (Nutanix Enterprise AI)', meta.nai || ''],
+                    ['NDB (Nutanix Database Service)', meta.ndb || '']
+                ];
+
+                var ws = XLSX.utils.aoa_to_sheet(rows);
+                var wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'AI Use Cases');
+                XLSX.writeFile(wb, getSafeFilename() + '.xlsx');
+            });
+        })();
+    </script>
+</body>
+</html>
