@@ -258,6 +258,42 @@
             margin-bottom: 0.75rem;
         }
 
+        .discovery-question-item {
+            margin-bottom: var(--space-lg);
+        }
+
+        .discovery-question-item .discovery-q-text {
+            font-weight: 500;
+            margin-bottom: 0.35rem;
+            color: var(--text);
+        }
+
+        .discovery-question-item .discovery-answer {
+            width: 100%;
+            min-height: 72px;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: var(--font-base);
+            color: var(--text);
+            background: var(--bg);
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        .discovery-question-item .discovery-answer::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .discovery-qa-block {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .discovery-qa-block:last-child { border-bottom: none; }
+
         .discovery-actions {
             flex-wrap: wrap;
             gap: 0.5rem;
@@ -971,16 +1007,38 @@
                 var introEl = document.getElementById('discoveryQuestionsIntro');
                 var listEl = document.getElementById('discoveryQuestionsList');
                 if (titleEl) titleEl.textContent = 'Discovery Questions for ' + verticalName;
-                if (introEl) introEl.textContent = 'Use these vertical-specific questions to uncover details before the assessment.';
+                if (introEl) introEl.textContent = 'Use these vertical-specific questions to uncover details before the assessment. Enter notes below; they will be included in the report.';
                 if (!listEl) return;
                 listEl.innerHTML = '';
                 if (questions && questions.length) {
                     questions.forEach(function(q, i) {
                         var li = document.createElement('li');
-                        li.textContent = q;
+                        li.className = 'discovery-question-item';
+                        var label = document.createElement('div');
+                        label.className = 'discovery-q-text';
+                        label.textContent = (i + 1) + '. ' + q;
+                        var ta = document.createElement('textarea');
+                        ta.className = 'discovery-answer';
+                        ta.setAttribute('data-index', i);
+                        ta.id = 'discoveryAnswer' + i;
+                        ta.placeholder = 'Enter notes or client response...';
+                        ta.setAttribute('aria-label', 'Answer for question ' + (i + 1));
+                        li.appendChild(label);
+                        li.appendChild(ta);
                         listEl.appendChild(li);
                     });
                 }
+            }
+
+            function getDiscoveryAnswers(vertical) {
+                var questions = window.VERTICAL_DISCOVERY_QUESTIONS && window.VERTICAL_DISCOVERY_QUESTIONS[vertical];
+                var listEl = document.getElementById('discoveryQuestionsList');
+                if (!questions || !questions.length || !listEl) return [];
+                var textareas = listEl.querySelectorAll('textarea.discovery-answer');
+                return questions.map(function(q, i) {
+                    var ta = textareas[i];
+                    return { question: q, answer: (ta && ta.value) ? ta.value.trim() : '' };
+                });
             }
 
             function downloadQuestionsWord(vertical) {
@@ -1194,6 +1252,19 @@
                 (data.painPoints || []).forEach(function(p) { html += '<li>' + escapeHtml(p) + '</li>'; });
                 html += '</ul></div>';
 
+                var discoveryAnswers = data.discoveryAnswers || [];
+                var hasDiscovery = discoveryAnswers.some(function(item) { return item.answer.length > 0; });
+                if (hasDiscovery) {
+                    html += '<div class="result-card"><h3>Discovery Notes</h3><p>Notes captured during discovery for use in the report.</p>';
+                    discoveryAnswers.forEach(function(item) {
+                        if (item.answer) {
+                            html += '<div class="discovery-qa-block"><p><strong>Q:</strong> ' + escapeHtml(item.question) + '</p>';
+                            html += '<p><strong>A:</strong> ' + escapeHtml(item.answer) + '</p></div>';
+                        }
+                    });
+                    html += '</div>';
+                }
+
                 html += '<div class="recommendation-box"><h3>Why This Matters for ' + escapeHtml(vm.name) + '</h3>';
                 html += '<p>' + escapeHtml(vm.drivers) + '</p>';
                 html += '<h4>Nutanix Platform &amp; Product Value</h4>';
@@ -1262,6 +1333,19 @@
                 lines.push('--- BUSINESS DRIVERS ---');
                 lines.push(vm.drivers);
                 lines.push('');
+                var discoveryAnswers = data.discoveryAnswers || [];
+                var hasDiscovery = discoveryAnswers.some(function(item) { return item.answer.length > 0; });
+                if (hasDiscovery) {
+                    lines.push('--- DISCOVERY NOTES ---');
+                    lines.push('');
+                    discoveryAnswers.forEach(function(item) {
+                        if (item.answer) {
+                            lines.push('Q: ' + item.question);
+                            lines.push('A: ' + item.answer);
+                            lines.push('');
+                        }
+                    });
+                }
                 lines.push('--- NUTANIX PLATFORM & PRODUCT VALUE ---');
                 if (vm.platformValue) { lines.push('Platform: ' + vm.platformValue); lines.push(''); }
                 if (vm.nus) { lines.push('NUS (Nutanix Unified Storage): ' + vm.nus); lines.push(''); }
@@ -1320,6 +1404,16 @@
                 (data.painPoints || []).forEach(function(p) { html += '<li>' + escapeHtml(p) + '</li>'; });
                 html += '</ul>';
                 html += '<h2>Why This Matters</h2><p class="report-block">' + escapeHtml(vm.drivers) + '</p>';
+                var discoveryAnswers = data.discoveryAnswers || [];
+                var hasDiscovery = discoveryAnswers.some(function(item) { return item.answer.length > 0; });
+                if (hasDiscovery) {
+                    html += '<h2>Discovery Notes</h2>';
+                    discoveryAnswers.forEach(function(item) {
+                        if (item.answer) {
+                            html += '<p class="report-block"><strong>Q:</strong> ' + escapeHtml(item.question) + '<br><strong>A:</strong> ' + escapeHtml(item.answer) + '</p>';
+                        }
+                    });
+                }
                 html += '<h2>Nutanix Platform &amp; Product Value</h2>';
                 if (vm.platformValue) html += '<p class="report-block"><strong>Platform:</strong> ' + escapeHtml(vm.platformValue) + '</p>';
                 if (vm.nus) html += '<p class="report-block"><strong>Nutanix Unified Storage (NUS):</strong> ' + escapeHtml(vm.nus) + '</p>';
@@ -1348,6 +1442,7 @@
                     alert('Please select an industry vertical.');
                     return;
                 }
+                data.discoveryAnswers = getDiscoveryAnswers(data.vertical);
                 if (!data.priorities.length) {
                     alert('Please select at least one business priority.');
                     return;
@@ -1445,13 +1540,23 @@
                 var XLSX = window.XLSX;
                 if (!XLSX) { alert('Excel export library not loaded.'); return; }
 
+                var discoveryAnswers = data.discoveryAnswers || [];
+                var discoveryRows = [];
+                if (discoveryAnswers.some(function(item) { return item.answer.length > 0; })) {
+                    discoveryRows = [[], ['Discovery Notes', '']];
+                    discoveryAnswers.forEach(function(item) {
+                        if (item.answer) discoveryRows.push(['Q', item.question], ['A', item.answer]);
+                    });
+                    discoveryRows.push([]);
+                }
                 var rows = [
                     ['Nutanix AI Use Case Discovery Report', ''],
                     ['Client', data.clientName],
                     ['Industry', meta.name || data.vertical],
                     ['Company Size', data.companySize],
                     ['Date', new Date().toLocaleDateString()],
-                    [],
+                    []
+                ].concat(discoveryRows).concat([
                     ['Current Use Cases', 'Details (selected only)'],
                     ...current.map(function(u) { return [u.title, detailFor(u)]; }),
                     [],
@@ -1469,7 +1574,7 @@
                     ['NKP (Nutanix Kubernetes Platform)', meta.nkp || ''],
                     ['NAI (Nutanix Enterprise AI)', meta.nai || ''],
                     ['NDB (Nutanix Database Service)', meta.ndb || '']
-                ];
+                ]);
 
                 var ws = XLSX.utils.aoa_to_sheet(rows);
                 var wb = XLSX.utils.book_new();

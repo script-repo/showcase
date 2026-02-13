@@ -1286,6 +1286,8 @@ window.VERTICAL_META = {
  */
 window.VERTICAL_DISCOVERY_QUESTIONS = {
   financial: [
+    'Where are you in your AI journey?',
+    'Are you just researching or is there a funded project?',
     'What AI or ML use cases are you already running in production (e.g., fraud, risk, document processing)?',
     'Where do you see the most manual effort today in compliance, reporting, or customer onboarding?',
     'What is your timeline for new AI initiatives (regulatory pressure, competitive, or strategic)?',
@@ -1296,6 +1298,8 @@ window.VERTICAL_DISCOVERY_QUESTIONS = {
     'What are your biggest concerns with AI (explainability, compliance, data residency)?',
   ],
   healthcare: [
+    'Where are you in your AI journey?',
+    'Are you just researching or is there a funded project?',
     'What AI or analytics are you using today (clinical, operational, or research)?',
     'Where is documentation or administrative burden slowing down clinicians or staff?',
     'What are your priorities: clinical outcomes, cost reduction, or patient experience?',
@@ -1306,6 +1310,8 @@ window.VERTICAL_DISCOVERY_QUESTIONS = {
     'What is your timeline for AI pilots (months vs. years)?',
   ],
   manufacturing: [
+    'Where are you in your AI journey?',
+    'Are you just researching or is there a funded project?',
     'Where are you using AI or analytics today (quality, maintenance, supply chain)?',
     'What manual or repetitive processes are candidates for automation or AI?',
     'How is data collected from the factory floor (OT/IT integration, edge)?',
@@ -1316,6 +1322,8 @@ window.VERTICAL_DISCOVERY_QUESTIONS = {
     'What is your timeline for scaling AI beyond pilots?',
   ],
   retail: [
+    'Where are you in your AI journey?',
+    'Are you just researching or is there a funded project?',
     'What AI are you using today (recommendations, pricing, inventory, or customer service)?',
     'Where do you see the biggest gaps in personalization or customer experience?',
     'How unified is your data across stores, e‑commerce, and loyalty?',
@@ -1326,6 +1334,8 @@ window.VERTICAL_DISCOVERY_QUESTIONS = {
     'What concerns do you have about AI (bias, transparency, control)?',
   ],
   telecom: [
+    'Where are you in your AI journey?',
+    'Are you just researching or is there a funded project?',
     'What AI are you using for network, customer experience, or operations today?',
     'Where is manual effort highest (provisioning, support, assurance)?',
     'How are you thinking about GenAI for customer care or internal knowledge?',
@@ -1336,6 +1346,8 @@ window.VERTICAL_DISCOVERY_QUESTIONS = {
     'What would success look like for AI in the next 12–18 months?',
   ],
   energy: [
+    'Where are you in your AI journey?',
+    'Are you just researching or is there a funded project?',
     'What AI or analytics are you using for grid, renewables, or customer operations?',
     'Where do you see the most manual or repetitive work (reporting, field, customer)?',
     'Are you exploring GenAI for regulatory docs, customer communication, or planning?',
@@ -1346,6 +1358,8 @@ window.VERTICAL_DISCOVERY_QUESTIONS = {
     'What are your biggest concerns (security, explainability, vendor lock-in)?',
   ],
   government: [
+    'Where are you in your AI journey?',
+    'Are you just researching or is there a funded project?',
     'What AI or automation are you using today (citizen services, back office, or analytics)?',
     'Where do you see the most manual effort (forms, casework, reporting)?',
     'Are you evaluating GenAI for policy, citizen communication, or internal knowledge?',
@@ -1356,6 +1370,8 @@ window.VERTICAL_DISCOVERY_QUESTIONS = {
     'What would success look like for AI in your agency?',
   ],
   education: [
+    'Where are you in your AI journey?',
+    'Are you just researching or is there a funded project?',
     'What AI or analytics are you using today (learning, research, or administration)?',
     'Where do you see the most manual effort (enrollment, support, content, assessment)?',
     'Are you exploring GenAI for teaching, research, or administrative tasks?',
@@ -1366,6 +1382,8 @@ window.VERTICAL_DISCOVERY_QUESTIONS = {
     'What concerns do you have about AI (academic integrity, privacy, equity)?',
   ],
   technology: [
+    'Where are you in your AI journey?',
+    'Are you just researching or is there a funded project?',
     'What AI are you using for product, engineering, or go-to-market today?',
     'Where do you see the most manual effort (support, docs, internal tools)?',
     'Are you using or evaluating GenAI for code, docs, or customer-facing features?',
@@ -1376,6 +1394,8 @@ window.VERTICAL_DISCOVERY_QUESTIONS = {
     'What are your biggest concerns (cost, security, IP)?',
   ],
   professional: [
+    'Where are you in your AI journey?',
+    'Are you just researching or is there a funded project?',
     'What AI or automation are you using today (research, documents, or client delivery)?',
     'Where do you see the most manual effort (proposals, matter management, billing)?',
     'Are you evaluating GenAI for client work or internal knowledge?',
