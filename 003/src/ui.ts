@@ -13,15 +13,3 @@ export interface DomainStat {
   rate: number;
 }
 
-export interface GeneratedQuestion {
-  question: string;
-  options: string[];
-  correctIndex: number;
-  explanation: string;
-}
-
-export interface ExplainModalData {
-  question: string;
-  correctOption: string;
-  response: string;
-}

@@ -1,26 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
 import { QUESTION_BANK } from './data/questions';
 import { DOMAINS, type Domain, type Question } from './types';
-import type {
-  AnswerMap,
-  DomainStat,
-  ExplainModalData,
-  FeedbackMap,
-  FlagMap,
-  GeneratedQuestion,
-} from './ui';
+import type { AnswerMap, DomainStat, FeedbackMap, FlagMap } from './ui';
 import { useSound } from './hooks/useSound';
 import { usePersistedState } from './lib/usePersistedState';
 import { pressCalculatorKey } from './lib/calculator';
-import { generateContent } from './lib/gemini';
 import { parseMarkdownBank } from './lib/parseMarkdown';
+import { shuffle, shuffleQuestionOptions, type ShuffledQuestion } from './lib/shuffle';
 import { Dashboard } from './components/Dashboard';
 import { StudyMode } from './components/StudyMode';
 import { TestingMode } from './components/TestingMode';
 import { ReviewMode } from './components/ReviewMode';
 import { ResultsMode } from './components/ResultsMode';
 import { ImportMode } from './components/ImportMode';
-import { ApiKeyModal, ExplainModal } from './components/Modals';
 
 type Mode = 'dashboard' | 'study' | 'testing' | 'review' | 'results' | 'import';
 
@@ -40,7 +32,8 @@ export default function App() {
   const [flaggedQuestions, setFlaggedQuestions] = usePersistedState<FlagMap>('flags', {});
   const [studyFeedback, setStudyFeedback] = usePersistedState<FeedbackMap>('feedback', {});
 
-  const [activeTestQuestions, setActiveTestQuestions] = useState<Question[]>([]);
+  const [activeTestQuestions, setActiveTestQuestions] = useState<ShuffledQuestion[]>([]);
+  const [studyQuestions, setStudyQuestions] = useState<ShuffledQuestion[]>([]);
 
   const [examTimer, setExamTimer] = useState(EXAM_SECONDS);
   const [isTimerHidden, setIsTimerHidden] = useState(false);
@@ -52,21 +45,8 @@ export default function App() {
   const [showCalculator, setShowCalculator] = useState(false);
   const [calcInput, setCalcInput] = useState('');
   const [soundEnabled, setSoundEnabled] = usePersistedState('sound', true);
-  const [geminiApiKey, setGeminiApiKey] = usePersistedState('gemini-key', '');
-  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
-
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiError, setAiError] = useState('');
-  const [aiStudyPlan, setAiStudyPlan] = useState('');
-  const [activeExplainModal, setActiveExplainModal] = useState<ExplainModalData | null>(null);
-
-  const [sandboxDomain, setSandboxDomain] = useState<Domain>('Kubernetes Fundamentals');
-  const [generatedQuestion, setGeneratedQuestion] = useState<GeneratedQuestion | null>(null);
-  const [sandboxAnswerSelected, setSandboxAnswerSelected] = useState<number | null>(null);
-  const [sandboxVerified, setSandboxVerified] = useState(false);
 
   const play = useSound(soundEnabled);
-  const hasApiKey = Boolean(geminiApiKey);
 
   const domainStatistics: DomainStat[] = useMemo(
     () =>
@@ -90,10 +70,24 @@ export default function App() {
     return Math.round((correct / questionBank.length) * 100);
   }, [selectedAnswers, questionBank]);
 
-  const studyQuestions = useMemo(
-    () => (selectedDomain === 'All' ? questionBank : questionBank.filter((q) => q.domain === selectedDomain)),
-    [selectedDomain, questionBank],
-  );
+  // Build a freshly shuffled set of study questions (order + options) for a domain.
+  const buildStudyQuestions = (domain: 'All' | Domain): ShuffledQuestion[] => {
+    const pool = domain === 'All' ? questionBank : questionBank.filter((q) => q.domain === domain);
+    return shuffle(pool).map(shuffleQuestionOptions);
+  };
+
+  // Translate canonical (stored) answer indices into the displayed positions for a
+  // given (possibly shuffled) set of questions, so components render in displayed space.
+  const toDisplayed = (qs: Question[]): AnswerMap => {
+    const map: AnswerMap = {};
+    for (const q of qs) {
+      const canonical = selectedAnswers[q.id];
+      if (canonical === undefined) continue;
+      const order = (q as ShuffledQuestion).optionOrder;
+      map[q.id] = order ? order.indexOf(canonical) : canonical;
+    }
+    return map;
+  };
 
   // Exam countdown
   useEffect(() => {
@@ -109,8 +103,9 @@ export default function App() {
   }, [examTimerActive, examTimer]);
 
   const startTimedExam = () => {
-    const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
-    const selected = shuffled.slice(0, Math.min(EXAM_SIZE, shuffled.length));
+    const selected = shuffle(questionBank)
+      .slice(0, Math.min(EXAM_SIZE, questionBank.length))
+      .map(shuffleQuestionOptions);
     setActiveTestQuestions(selected);
     setSelectedAnswers({});
     setFlaggedQuestions({});
@@ -130,11 +125,12 @@ export default function App() {
 
   const activeQuestions = activeMode === 'study' ? studyQuestions : activeTestQuestions;
 
-  const selectOption = (optIndex: number) => {
+  const selectOption = (displayedIdx: number) => {
     play('click');
     const q = activeQuestions[currentQuestionIndex];
     if (!q) return;
-    setSelectedAnswers((prev) => ({ ...prev, [q.id]: optIndex }));
+    const canonical = q.optionOrder[displayedIdx];
+    setSelectedAnswers((prev) => ({ ...prev, [q.id]: canonical }));
   };
 
   const toggleFlag = () => {
@@ -159,7 +155,7 @@ export default function App() {
     if (!q) return;
     const chosen = selectedAnswers[q.id];
     if (chosen === undefined) return;
-    const correct = chosen === q.correctIndex;
+    const correct = chosen === q.optionOrder[q.correctIndex];
     setStudyFeedback((prev) => ({ ...prev, [q.id]: { checked: true, correct } }));
     play(correct ? 'success' : 'failure');
   };
@@ -172,106 +168,8 @@ export default function App() {
   const goToMode = (mode: Mode) => {
     play('click');
     setCurrentQuestionIndex(0);
+    if (mode === 'study') setStudyQuestions(buildStudyQuestions(selectedDomain));
     setActiveMode(mode);
-  };
-
-  // ---- AI features (require a user-supplied key) ----
-  const requireKey = () => {
-    if (!hasApiKey) {
-      setAiError('Add a Gemini API key first (top-right ✨ Key button) to use AI features.');
-      setShowApiKeyModal(true);
-      return false;
-    }
-    return true;
-  };
-
-  const handleGenerateStudyPlan = async () => {
-    if (!requireKey()) return;
-    setAiLoading(true);
-    setAiError('');
-    setAiStudyPlan('');
-    play('click');
-    try {
-      const stats = domainStatistics
-        .map((s) => `- ${s.name}: ${s.correct}/${s.total} correct`)
-        .join('\n');
-      const response = await generateContent({
-        apiKey: geminiApiKey,
-        systemPrompt: 'You are an experienced SRE and Kubernetes trainer building certification study plans.',
-        prompt: `Build an encouraging, well-organized 7-day study plan to master the KCNA exam. Focus on my weakest domains. My current performance:\n${stats}\n\nFor each day include: CNCF documentation reading targets, a hands-on lab goal using minikube or kind, and an exam-strategy checkpoint.`,
-      });
-      setAiStudyPlan(response);
-      play('success');
-    } catch {
-      setAiError('Could not generate the study plan. Check your API key and connection.');
-      play('failure');
-    } finally {
-      setAiLoading(false);
-    }
-  };
-
-  const handleAiExplain = async () => {
-    if (!requireKey()) return;
-    const q = studyQuestions[currentQuestionIndex];
-    if (!q) return;
-    setAiLoading(true);
-    setAiError('');
-    setActiveExplainModal(null);
-    play('click');
-    try {
-      const response = await generateContent({
-        apiKey: geminiApiKey,
-        systemPrompt: 'You are an expert Kubernetes trainer giving a clear conceptual deep-dive.',
-        prompt: `Explain this KCNA question in depth.\nQuestion: "${q.question}"\nOptions:\n${q.options
-          .map((opt, i) => `${String.fromCharCode(65 + i)}. ${opt}`)
-          .join('\n')}\nCorrect answer: "${q.options[q.correctIndex]}"\n\nInclude: (1) why the correct answer is right and the others are wrong, (2) a real-world analogy, and (3) 2-3 kubectl commands to explore this in a local cluster. Use clear markdown.`,
-      });
-      setActiveExplainModal({
-        question: q.question,
-        correctOption: q.options[q.correctIndex],
-        response,
-      });
-    } catch {
-      setAiError('Could not reach Gemini. Check your API key and connection.');
-      play('failure');
-    } finally {
-      setAiLoading(false);
-    }
-  };
-
-  const handleGenerateSandbox = async () => {
-    if (!requireKey()) return;
-    setAiLoading(true);
-    setAiError('');
-    setGeneratedQuestion(null);
-    setSandboxAnswerSelected(null);
-    setSandboxVerified(false);
-    play('click');
-    try {
-      const response = await generateContent({
-        apiKey: geminiApiKey,
-        systemPrompt: 'You are a CNCF certification author. Always return valid JSON matching the schema.',
-        prompt: `Generate one challenging, conceptual KCNA multiple-choice question in the domain "${sandboxDomain}". Provide exactly 4 plausible options, a correctIndex (0-3), and a clear explanation. Focus on real-world behavior, not trivia.`,
-        responseSchema: {
-          type: 'OBJECT',
-          properties: {
-            question: { type: 'STRING' },
-            options: { type: 'ARRAY', items: { type: 'STRING' }, minItems: 4, maxItems: 4 },
-            correctIndex: { type: 'INTEGER' },
-            explanation: { type: 'STRING' },
-          },
-          required: ['question', 'options', 'correctIndex', 'explanation'],
-        },
-      });
-      const parsed = JSON.parse(response) as GeneratedQuestion;
-      setGeneratedQuestion(parsed);
-      play('success');
-    } catch {
-      setAiError('Sandbox generation failed. Check your API key and try again.');
-      play('failure');
-    } finally {
-      setAiLoading(false);
-    }
   };
 
   const handleImportMarkdown = () => {
@@ -311,6 +209,8 @@ export default function App() {
     </button>
   );
 
+  const resultsQuestions = activeTestQuestions.length > 0 ? activeTestQuestions : questionBank;
+
   return (
     <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col font-sans antialiased">
       <header className="border-b border-slate-800 bg-[#04060a]/90 backdrop-blur-md px-6 py-4 flex items-center justify-between sticky top-0 z-40">
@@ -335,16 +235,6 @@ export default function App() {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowApiKeyModal(true)}
-            className={`p-2 rounded-lg border text-xs font-bold font-mono px-2.5 ${
-              hasApiKey
-                ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
-                : 'text-slate-400 bg-slate-800/50 border-slate-700'
-            }`}
-          >
-            ✨ Key
-          </button>
-          <button
             onClick={() => setSoundEnabled(!soundEnabled)}
             className={`p-2 rounded-lg border text-xs font-bold font-mono px-2.5 ${
               soundEnabled
@@ -365,22 +255,6 @@ export default function App() {
         {navButton('import', 'Import')}
       </nav>
 
-      {aiLoading && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center space-y-4">
-          <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm font-bold tracking-widest text-indigo-400 animate-pulse uppercase">Asking Gemini…</p>
-        </div>
-      )}
-
-      {aiError && (
-        <div className="bg-rose-950/80 border border-rose-500/40 p-4 mx-6 mt-4 rounded-xl flex items-center justify-between animate-fadeIn">
-          <span className="text-xs font-bold text-rose-300">{aiError}</span>
-          <button onClick={() => setAiError('')} className="text-rose-400 text-xs font-bold hover:underline">
-            Dismiss
-          </button>
-        </div>
-      )}
-
       {activeMode === 'dashboard' && (
         <Dashboard
           questionCount={questionBank.length}
@@ -388,24 +262,8 @@ export default function App() {
           flaggedCount={Object.values(flaggedQuestions).filter(Boolean).length}
           overallReadiness={overallReadiness}
           domainStatistics={domainStatistics}
-          hasApiKey={hasApiKey}
-          aiStudyPlan={aiStudyPlan}
-          onClearStudyPlan={() => setAiStudyPlan('')}
           onLaunchTest={startTimedExam}
           onEnterStudy={() => goToMode('study')}
-          onGenerateStudyPlan={handleGenerateStudyPlan}
-          sandboxDomain={sandboxDomain}
-          onSandboxDomainChange={setSandboxDomain}
-          onGenerateSandbox={handleGenerateSandbox}
-          generatedQuestion={generatedQuestion}
-          onCloseSandbox={() => setGeneratedQuestion(null)}
-          sandboxAnswerSelected={sandboxAnswerSelected}
-          onSandboxSelect={setSandboxAnswerSelected}
-          sandboxVerified={sandboxVerified}
-          onVerifySandbox={() => {
-            setSandboxVerified(true);
-            play(sandboxAnswerSelected === generatedQuestion?.correctIndex ? 'success' : 'failure');
-          }}
         />
       )}
 
@@ -417,6 +275,7 @@ export default function App() {
             play('click');
             setSelectedDomain(d);
             setCurrentQuestionIndex(0);
+            setStudyQuestions(buildStudyQuestions(d));
           }}
           currentIndex={currentQuestionIndex}
           onSelectOption={selectOption}
@@ -424,9 +283,7 @@ export default function App() {
           onPrev={handlePrev}
           onNext={handleNext}
           onVerify={verifyStudyAnswer}
-          onExplainWithAi={handleAiExplain}
-          hasApiKey={hasApiKey}
-          selectedAnswers={selectedAnswers}
+          selectedAnswers={toDisplayed(studyQuestions)}
           flaggedQuestions={flaggedQuestions}
           studyFeedback={studyFeedback}
         />
@@ -439,7 +296,7 @@ export default function App() {
           examTimer={examTimer}
           isTimerHidden={isTimerHidden}
           onToggleTimer={() => setIsTimerHidden((v) => !v)}
-          selectedAnswers={selectedAnswers}
+          selectedAnswers={toDisplayed(activeTestQuestions)}
           flaggedQuestions={flaggedQuestions}
           onSelectOption={selectOption}
           onToggleFlag={toggleFlag}
@@ -456,7 +313,7 @@ export default function App() {
       {activeMode === 'review' && (
         <ReviewMode
           questions={activeTestQuestions}
-          selectedAnswers={selectedAnswers}
+          selectedAnswers={toDisplayed(activeTestQuestions)}
           flaggedQuestions={flaggedQuestions}
           onJumpTo={(idx) => {
             play('click');
@@ -470,8 +327,8 @@ export default function App() {
 
       {activeMode === 'results' && (
         <ResultsMode
-          questions={activeTestQuestions.length > 0 ? activeTestQuestions : questionBank}
-          selectedAnswers={selectedAnswers}
+          questions={resultsQuestions}
+          selectedAnswers={toDisplayed(resultsQuestions)}
           onRetake={startTimedExam}
           onHome={() => goToMode('dashboard')}
         />
@@ -483,22 +340,6 @@ export default function App() {
           onChange={setRawMarkdown}
           onImport={handleImportMarkdown}
           importStatus={importStatus}
-        />
-      )}
-
-      {activeExplainModal && (
-        <ExplainModal data={activeExplainModal} onClose={() => setActiveExplainModal(null)} />
-      )}
-
-      {showApiKeyModal && (
-        <ApiKeyModal
-          currentKey={geminiApiKey}
-          onSave={(key) => {
-            setGeminiApiKey(key);
-            setShowApiKeyModal(false);
-            if (key) setAiError('');
-          }}
-          onClose={() => setShowApiKeyModal(false)}
         />
       )}
 

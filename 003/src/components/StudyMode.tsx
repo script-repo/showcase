@@ -11,8 +11,6 @@ interface StudyModeProps {
   onPrev: () => void;
   onNext: () => void;
   onVerify: () => void;
-  onExplainWithAi: () => void;
-  hasApiKey: boolean;
   selectedAnswers: AnswerMap;
   flaggedQuestions: FlagMap;
   studyFeedback: FeedbackMap;
@@ -29,8 +27,6 @@ export function StudyMode(props: StudyModeProps) {
     onPrev,
     onNext,
     onVerify,
-    onExplainWithAi,
-    hasApiKey,
     selectedAnswers,
     flaggedQuestions,
     studyFeedback,
@@ -64,22 +60,12 @@ export function StudyMode(props: StudyModeProps) {
             <span className="text-[10px] uppercase font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded border border-indigo-500/20">
               {current.domain}
             </span>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={onExplainWithAi}
-                disabled={!hasApiKey}
-                title={hasApiKey ? undefined : 'Add a Gemini API key (top-right) to enable AI features'}
-                className="text-xs font-bold text-indigo-400 hover:text-indigo-300 disabled:text-slate-600 transition-all flex items-center gap-1 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 rounded"
-              >
-                Explain with AI ✨
-              </button>
-              <button
-                onClick={onToggleFlag}
-                className={`text-xs font-mono font-bold ${flaggedQuestions[current.id] ? 'text-amber-400' : 'text-slate-500'}`}
-              >
-                {flaggedQuestions[current.id] ? '🚩 Flagged' : '🏳️ Flag'}
-              </button>
-            </div>
+            <button
+              onClick={onToggleFlag}
+              className={`text-xs font-mono font-bold ${flaggedQuestions[current.id] ? 'text-amber-400' : 'text-slate-500'}`}
+            >
+              {flaggedQuestions[current.id] ? '🚩 Flagged' : '🏳️ Flag'}
+            </button>
           </div>
           <h4 className="text-sm md:text-base font-bold text-slate-100">{current.question}</h4>
           <div className="space-y-2">
