@@ -1,1 +1,664 @@
-hello world
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KCNA Pre-Exam — Fact Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --water:#EEF2FA;
+  --paper:#FFFFFF;
+  --ink:#1C2540;
+  --ink-soft:#525E85;
+  --contour:#D8E0F2;
+  --magenta:#D6455D;
+  --magenta-soft:#FCEBEE;
+  --buoy:#B87514;
+  --buoy-soft:#FBF2DF;
+  --teal:#3563E9;
+  --teal-soft:#E5ECFD;
+  --card:#FFFFFF;
+  --radius:12px;
+  --shadow:0 1px 2px rgba(28,37,64,.06),0 6px 18px rgba(28,37,64,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',sans-serif;
+  color:var(--ink);
+  background:var(--water);
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 47px,rgba(53,99,233,.05) 47px,rgba(53,99,233,.05) 48px),
+    repeating-linear-gradient(90deg,transparent,transparent 47px,rgba(53,99,233,.05) 47px,rgba(53,99,233,.05) 48px);
+  font-size:16.5px;
+  line-height:1.6;
+  min-height:100vh;
+}
+.wrap{max-width:1060px;margin:0 auto;padding:0 clamp(14px,3vw,32px) 90px}
+
+/* ---------- Chart title block ---------- */
+header{
+  border:2px solid var(--ink);
+  border-top:none;
+  background:var(--paper);
+  padding:clamp(18px,3.5vw,30px) clamp(16px,3.5vw,34px) clamp(16px,3vw,24px);
+  position:relative;
+  box-shadow:var(--shadow);
+}
+header::before{
+  content:"";position:absolute;inset:6px;border:1px solid var(--contour);pointer-events:none;
+}
+.chart-no{
+  font-family:'IBM Plex Mono',monospace;font-size:.78rem;letter-spacing:.1em;
+  color:var(--ink-soft);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;
+  text-transform:uppercase;position:relative;z-index:1;
+}
+.chart-no .m{color:var(--magenta)}
+h1{
+  font-family:'Sora',sans-serif;font-weight:700;
+  font-size:clamp(2rem,5.5vw,3.2rem);letter-spacing:-.02em;line-height:1.05;
+  margin:.35em 0 .15em;position:relative;z-index:1;
+}
+h1 .thin{font-weight:500;color:var(--teal)}
+.subtitle{font-size:clamp(.98rem,2.2vw,1.1rem);color:var(--ink-soft);max-width:56ch;position:relative;z-index:1}
+.compass{
+  position:absolute;right:clamp(10px,3vw,28px);top:50%;transform:translateY(-50%);
+  width:clamp(64px,10vw,108px);opacity:.9;z-index:0;
+}
+@media(max-width:560px){.compass{opacity:.28}}
+
+/* ---------- Soundings (domain weights) ---------- */
+.soundings{
+  border:2px solid var(--ink);border-top:none;background:var(--card);
+  display:grid;grid-template-columns:repeat(4,1fr);box-shadow:var(--shadow);
+}
+.sound{
+  padding:12px 12px 14px;border-right:1px solid var(--contour);position:relative;overflow:hidden;
+}
+.sound:last-child{border-right:none}
+.sound .pct{
+  font-family:'Sora',sans-serif;font-weight:700;font-size:clamp(1.4rem,3.4vw,2.1rem);
+  line-height:1;color:var(--teal);
+}
+.sound .lbl{
+  font-family:'IBM Plex Mono',monospace;font-size:clamp(.62rem,1.5vw,.74rem);
+  letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-top:4px;
+}
+.sound .depth{position:absolute;left:0;bottom:0;height:4px;background:var(--teal);opacity:.7}
+@media(max-width:640px){.soundings{grid-template-columns:repeat(2,1fr)}.sound:nth-child(2){border-right:none}.sound:nth-child(-n+2){border-bottom:1px solid var(--contour)}}
+
+/* ---------- Mode tabs ---------- */
+nav{
+  display:flex;gap:8px;margin:20px 0 22px;position:sticky;top:10px;z-index:50;
+}
+.tab{
+  flex:1;font-family:'Sora',sans-serif;font-weight:600;
+  letter-spacing:0;font-size:clamp(.95rem,2.4vw,1.1rem);
+  padding:12px 8px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);
+  cursor:pointer;border-radius:var(--radius);box-shadow:var(--shadow);
+  transition:transform .12s ease,background .15s ease,color .15s ease;
+}
+.tab:hover{transform:translateY(-1px)}
+.tab:focus-visible{outline:3px solid var(--magenta);outline-offset:2px}
+.tab.active{background:var(--ink);color:var(--paper)}
+.tab .sub{display:block;font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:.7rem;letter-spacing:.06em;opacity:.65;text-transform:none;margin-top:2px}
+@media(max-width:520px){.tab .sub{display:none}}
+
+/* ---------- Shared section headers ---------- */
+.legend{
+  display:flex;align-items:center;gap:10px;margin:26px 0 12px;
+}
+.legend h2{
+  font-family:'Sora',sans-serif;font-weight:600;
+  font-size:clamp(1.2rem,3.2vw,1.55rem);letter-spacing:-.01em;white-space:nowrap;
+}
+.legend .rule{flex:1;height:0;border-top:1px solid var(--ink);opacity:.35}
+.legend .tag{
+  font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.08em;color:var(--ink-soft);
+  text-transform:uppercase;white-space:nowrap;
+}
+
+/* ---------- Cram mode ---------- */
+.hooks{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.hook{
+  background:var(--card);border:1px solid var(--contour);border-left:5px solid var(--buoy);
+  border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);
+  font-size:1.02rem;
+}
+.hook b{font-weight:600}
+.hook .k{font-family:'IBM Plex Mono',monospace;font-size:.85em;background:var(--teal-soft);padding:1px 5px;border-radius:4px}
+.warnings{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.warning{
+  background:var(--magenta-soft);border:1px solid var(--magenta);border-radius:var(--radius);
+  padding:13px 15px;font-size:1rem;box-shadow:var(--shadow);
+}
+.warning .wtag{
+  font-family:'IBM Plex Mono',monospace;font-size:.7rem;letter-spacing:.08em;color:var(--magenta);
+  text-transform:uppercase;display:block;margin-bottom:5px;
+}
+.flowline{
+  background:var(--ink);color:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:16px 18px;margin-bottom:12px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;
+}
+.flowline .name{font-family:'Sora',sans-serif;font-weight:600;letter-spacing:0;font-size:1.05rem;color:#A9BCF5;min-width:150px}
+.flowline .steps{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:clamp(.72rem,2vw,.85rem)}
+.flowline .step{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);padding:4px 10px;border-radius:6px}
+.flowline .arr{opacity:.55}
+
+/* ---------- Chart (browse) mode ---------- */
+.searchbar{
+  display:flex;gap:8px;margin-bottom:8px;
+}
+.searchbar input{
+  flex:1;font-family:'IBM Plex Mono',monospace;font-size:.9rem;padding:12px 14px;
+  border:2px solid var(--ink);border-radius:var(--radius);background:var(--card);color:var(--ink);
+}
+.searchbar input:focus-visible{outline:3px solid var(--magenta);outline-offset:2px}
+.searchbar input::placeholder{color:var(--ink-soft);opacity:.7}
+.domain-jump{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.jump{
+  font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;
+  padding:5px 9px;border:1px solid var(--ink);border-radius:20px;background:var(--paper);cursor:pointer;color:var(--ink);
+}
+.jump:hover{background:var(--ink);color:var(--paper)}
+.jump:focus-visible{outline:3px solid var(--magenta);outline-offset:2px}
+.section{
+  background:var(--card);border:1px solid var(--contour);border-radius:var(--radius);
+  box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden;
+}
+.section-head{
+  width:100%;display:flex;align-items:center;gap:10px;padding:13px 16px;background:none;border:none;
+  cursor:pointer;text-align:left;
+}
+.section-head:focus-visible{outline:3px solid var(--magenta);outline-offset:-3px}
+.section-head h3{
+  font-family:'Sora',sans-serif;font-weight:600;text-transform:uppercase;
+  font-size:1.12rem;letter-spacing:.05em;flex:1;
+}
+.section-head .count{font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--ink-soft);letter-spacing:.08em}
+.section-head .chev{transition:transform .2s ease;color:var(--teal);flex-shrink:0}
+.section.open .chev{transform:rotate(90deg)}
+.facts{display:none;padding:2px 16px 14px;border-top:1px dashed var(--contour)}
+.section.open .facts{display:block}
+.fact{
+  padding:9px 0 9px 18px;position:relative;font-size:1rem;border-bottom:1px dotted var(--contour);
+}
+.fact:last-child{border-bottom:none}
+.fact::before{
+  content:"";position:absolute;left:2px;top:16px;width:7px;height:7px;border:1.5px solid var(--teal);
+  border-radius:50%;background:var(--card);
+}
+.fact.tip{background:var(--magenta-soft);border-radius:6px;padding-left:22px;padding-right:10px;margin:4px 0;border-bottom:none}
+.fact.tip::before{left:7px;border-color:var(--magenta);background:var(--magenta)}
+.fact.tip .wtag{font-family:'IBM Plex Mono',monospace;font-size:.58rem;letter-spacing:.14em;color:var(--magenta);text-transform:uppercase;display:block}
+.fact code{font-family:'IBM Plex Mono',monospace;font-size:.84em;background:var(--teal-soft);padding:1px 5px;border-radius:4px;white-space:nowrap}
+.fact b{font-weight:600}
+mark{background:#FFEDB0;border-radius:3px;padding:0 1px}
+.domain-band{
+  font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--paper);background:var(--teal);display:inline-block;padding:4px 12px;border-radius:20px;margin:20px 0 10px;
+}
+.noresults{padding:26px;text-align:center;color:var(--ink-soft);font-style:italic}
+
+/* ---------- Drill mode ---------- */
+.drill-stage{max-width:640px;margin:0 auto}
+.drill-meta{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;
+  font-family:'IBM Plex Mono',monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);
+}
+.progress{height:6px;background:var(--contour);border-radius:3px;overflow:hidden;margin-bottom:16px}
+.progress .bar{height:100%;background:var(--magenta);transition:width .25s ease}
+.cardflip{perspective:1400px;cursor:pointer}
+.cardflip:focus-visible{outline:3px solid var(--magenta);outline-offset:4px;border-radius:var(--radius)}
+.card-inner{
+  position:relative;min-height:clamp(240px,42vh,340px);transition:transform .5s cubic-bezier(.2,.7,.3,1);
+  transform-style:preserve-3d;
+}
+.cardflip.flipped .card-inner{transform:rotateY(180deg)}
+.face{
+  position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--radius);
+  display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
+  padding:clamp(20px,4vw,38px);box-shadow:var(--shadow);
+}
+.face.q{background:var(--card);border:2px solid var(--ink)}
+.face.a{background:var(--ink);color:var(--paper);transform:rotateY(180deg);border:2px solid var(--ink)}
+.face .ftag{font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px}
+.face.q .ftag{color:var(--magenta)}
+.face.a .ftag{color:#A9BCF5}
+.face .txt{font-size:clamp(1.1rem,2.8vw,1.4rem);font-weight:500;line-height:1.5;max-width:34ch}
+.face.a .txt{font-weight:400}
+.face .hint{margin-top:18px;font-size:.72rem;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace}
+.face.a .hint{color:#8FA1D9}
+.drill-controls{display:flex;gap:8px;margin-top:16px}
+.dbtn{
+  flex:1;font-family:'Sora',sans-serif;font-weight:600;letter-spacing:0;
+  font-size:1rem;padding:12px;border:2px solid var(--ink);border-radius:var(--radius);cursor:pointer;
+  background:var(--paper);color:var(--ink);transition:transform .12s ease;box-shadow:var(--shadow);
+}
+.dbtn:hover{transform:translateY(-1px)}
+.dbtn:focus-visible{outline:3px solid var(--magenta);outline-offset:2px}
+.dbtn.primary{background:var(--magenta);border-color:var(--magenta);color:#fff}
+.drill-done{
+  text-align:center;padding:50px 20px;background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);box-shadow:var(--shadow);
+}
+.drill-done h3{font-family:'Sora',sans-serif;font-size:2rem;text-transform:uppercase;margin-bottom:8px}
+.hidden{display:none!important}
+
+footer{
+  margin-top:44px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.64rem;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);
+}
+@media(prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+  .card-inner{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="chart-no">
+    <span>Fact review · Weighted by exam domain</span>
+    <span class="m">Red = exam trap</span>
+  </div>
+  <h1>KCNA <span class="thin">Pre-Exam</span></h1>
+  <p class="subtitle">Every fact from the study log, distilled for the final five minutes before you walk in.</p>
+  <svg class="compass" viewBox="0 0 100 100" aria-hidden="true">
+    <circle cx="50" cy="50" r="46" fill="none" stroke="#1C2540" stroke-width="1.4"/>
+    <circle cx="50" cy="50" r="36" fill="none" stroke="#D8E0F2" stroke-width="1"/>
+    <polygon points="50,8 55,50 50,60 45,50" fill="#D6455D"/>
+    <polygon points="50,92 55,50 50,40 45,50" fill="#1C2540"/>
+    <polygon points="8,50 50,45 60,50 50,55" fill="#1C2540" opacity=".55"/>
+    <polygon points="92,50 50,45 40,50 50,55" fill="#1C2540" opacity=".55"/>
+    <circle cx="50" cy="50" r="3.4" fill="#1C2540"/>
+    <text x="50" y="6" text-anchor="middle" font-size="7" font-family="IBM Plex Mono,monospace" fill="#1C2540">N</text>
+  </svg>
+</header>
+
+<div class="soundings" role="list" aria-label="Exam domain weights">
+  <div class="sound" role="listitem"><div class="pct">44%</div><div class="lbl">Kubernetes Fundamentals</div><div class="depth" style="width:44%"></div></div>
+  <div class="sound" role="listitem"><div class="pct">28%</div><div class="lbl">Container Orchestration</div><div class="depth" style="width:28%"></div></div>
+  <div class="sound" role="listitem"><div class="pct">16%</div><div class="lbl">App Delivery</div><div class="depth" style="width:16%"></div></div>
+  <div class="sound" role="listitem"><div class="pct">12%</div><div class="lbl">Cloud Native Architecture</div><div class="depth" style="width:12%"></div></div>
+</div>
+
+<nav aria-label="Study modes">
+  <button class="tab active" data-mode="cram">Cram<span class="sub">5-min hooks &amp; traps</span></button>
+  <button class="tab" data-mode="chart">Chart<span class="sub">every fact, searchable</span></button>
+  <button class="tab" data-mode="drill">Drill<span class="sub">flashcards</span></button>
+</nav>
+
+<!-- ============ CRAM ============ -->
+<main id="mode-cram">
+  <div class="legend"><h2>Bearing Lines</h2><div class="rule"></div><span class="tag">memorize these flows</span></div>
+  <div class="flowline"><span class="name">API request</span><span class="steps"><span class="step">AuthN</span><span class="arr">→</span><span class="step">AuthZ</span><span class="arr">→</span><span class="step">Admission</span><span class="arr">→</span><span class="step">etcd</span></span></div>
+  <div class="flowline"><span class="name">4 Cs of security</span><span class="steps"><span class="step">Cloud</span><span class="arr">→</span><span class="step">Cluster</span><span class="arr">→</span><span class="step">Container</span><span class="arr">→</span><span class="step">Code</span></span></div>
+  <div class="flowline"><span class="name">Ownership</span><span class="steps"><span class="step">Deployment</span><span class="arr">→</span><span class="step">ReplicaSet</span><span class="arr">→</span><span class="step">Pod</span></span></div>
+  <div class="flowline"><span class="name">Scheduler</span><span class="steps"><span class="step">Filter</span><span class="arr">→</span><span class="step">Score</span><span class="arr">→</span><span class="step">Bind</span></span></div>
+  <div class="flowline"><span class="name">CNCF maturity</span><span class="steps"><span class="step">Sandbox</span><span class="arr">→</span><span class="step">Incubating</span><span class="arr">→</span><span class="step">Graduated</span></span></div>
+
+  <div class="legend"><h2>Memory Buoys</h2><div class="rule"></div><span class="tag">hooks</span></div>
+  <div class="hooks" id="hooks"></div>
+
+  <div class="legend"><h2>Navigation Warnings</h2><div class="rule"></div><span class="tag">exam traps in magenta</span></div>
+  <div class="warnings" id="warnings"></div>
+</main>
+
+<!-- ============ CHART ============ -->
+<main id="mode-chart" class="hidden">
+  <div class="searchbar">
+    <input id="search" type="search" placeholder="Search the chart… (e.g. probe, RBAC, helm)" aria-label="Search facts">
+  </div>
+  <div class="domain-jump" id="jumps"></div>
+  <div id="chart-body"></div>
+</main>
+
+<!-- ============ DRILL ============ -->
+<main id="mode-drill" class="hidden">
+  <div class="drill-stage">
+    <div class="drill-meta"><span id="drill-count">Card 1 / 1</span><span id="drill-known">0 known</span></div>
+    <div class="progress"><div class="bar" id="drill-bar" style="width:0%"></div></div>
+    <div id="drill-card-wrap">
+      <div class="cardflip" id="cardflip" tabindex="0" role="button" aria-label="Flashcard, activate to flip">
+        <div class="card-inner">
+          <div class="face q"><span class="ftag">Question</span><div class="txt" id="q-text"></div><span class="hint">tap / space to reveal</span></div>
+          <div class="face a"><span class="ftag">Answer</span><div class="txt" id="a-text"></div><span class="hint">rate yourself below</span></div>
+        </div>
+      </div>
+      <div class="drill-controls">
+        <button class="dbtn" id="btn-again">↺ Again later</button>
+        <button class="dbtn primary" id="btn-got">Got it ✓</button>
+      </div>
+      <div class="drill-controls">
+        <button class="dbtn" id="btn-shuffle">⇄ Shuffle deck</button>
+      </div>
+    </div>
+    <div id="drill-done" class="drill-done hidden">
+      <h3>Deck cleared</h3>
+      <p>Every card marked known. Fair winds in the exam room.</p>
+      <div class="drill-controls"><button class="dbtn primary" id="btn-restart">Run the deck again</button></div>
+    </div>
+  </div>
+</main>
+
+<footer>Good luck — you've got this. 🍀</footer>
+</div>
+
+<script>
+/* ================= DATA ================= */
+const HOOKS = [
+  "<b>CRI runs · CNI connects · CSI stores</b>",
+  "<b>Role defines; Binding grants</b> — RBAC in four words",
+  "Secrets are <b>base64 encoded, NOT encrypted</b>",
+  "<b>Only the API server</b> talks directly to etcd",
+  "<b>NodePort</b> = a door on every node · <b>LoadBalancer</b> = one receptionist out front",
+  "<b>PVC</b> = claim ticket · <b>PV</b> = the disk · <b>StorageClass</b> = catalog that makes disks on demand",
+  "<b>HPA out · VPA up · Cluster Autoscaler nodes · KEDA to zero</b>",
+  "Liveness fails → <b>restart</b> · Readiness fails → <b>removed from endpoints</b>",
+  "CPU over limit → <b>throttled</b> · Memory over limit → <b>OOM killed</b>",
+  "<b>SLI</b> measures · <b>SLO</b> targets · <b>SLA</b> promises (with consequences)",
+  "DNS: <span class='k'>&lt;svc&gt;.&lt;ns&gt;.svc.cluster.local</span>",
+  "Service ladder: <b>ClusterIP ⊂ NodePort ⊂ LoadBalancer</b> — each includes the last"
+];
+const WARNINGS = [
+  ["Deployment ≠ pods","A Deployment never creates pods directly — it manages ReplicaSets, which manage pods."],
+  ["Flannel & NetworkPolicy","NetworkPolicy needs an enforcing CNI. Cilium and Calico enforce; Flannel does NOT."],
+  ["Ingress alone is inert","An Ingress object does nothing without an ingress controller (nginx, Traefik) — itself usually fronted by a LoadBalancer."],
+  ["LoadBalancer vs Ingress","LoadBalancer exposes ONE service at L4. Ingress defines HTTP/HTTPS routing rules for many."],
+  ["Secrets phrase","If a question mentions Secrets, the answer likely contains: 'base64 encoded, not encrypted.' Real protection = RBAC + etcd encryption at rest."],
+  ["dockershim","Removed in v1.24. Use containerd or CRI-O. Docker-built images still run fine — the image format (OCI) is unaffected."],
+  ["Bare pods stay dead","A pod created without a controller is never recreated when it dies."],
+  ["Cluster-scoped objects","Nodes, PersistentVolumes, Namespaces, ClusterRoles are NOT namespaced."],
+  ["Helm weight","Post-exam intel: Helm shows up more than expected — install, upgrade, remove charts."],
+  ["No metrics, no scaling","Every autoscaler depends on a metrics pipeline. No metrics → no autoscaling."],
+  ["Namespaces & kubectl","Always pass -n <namespace>. Never trust the default."],
+  ["Traefik ≠ mesh","Traefik is an ingress/API gateway. Traefik Mesh is the mesh product — node-level proxies, not classic sidecars."]
+];
+
+const DOMAINS = [
+{name:"Kubernetes Fundamentals — 44%",sections:[
+ {title:"Control Plane",facts:[
+  {t:"Declarative model: desired state in YAML; controllers reconcile actual state toward desired state."},
+  {t:"<b>API server</b> — the front door; every component communicates through it."},
+  {t:"<b>etcd</b> — the cluster state store and source of truth."},
+  {t:"<b>Scheduler</b> — assigns pods to nodes."},
+  {t:"<b>Controller manager</b> — runs the reconciliation loops (deployments, replica sets, …)."},
+  {t:"Only the API server talks directly to etcd.",tip:true}]},
+ {title:"Worker Nodes",facts:[
+  {t:"<b>Kubelet</b> — node agent; starts pods and reports status."},
+  {t:"<b>Container runtime</b> (containerd, CRI-O) — runs the containers."},
+  {t:"<b>kube-proxy</b> — maintains network rules via iptables/IPVS."}]},
+ {title:"Objects & Ownership",facts:[
+  {t:"Four top-level fields on every object: <code>apiVersion</code>, <code>kind</code>, <code>metadata</code>, <code>spec</code>; the system maintains <code>status</code>."},
+  {t:"Ownership chain: Deployment → ReplicaSet → Pod."},
+  {t:"A bare pod that dies stays dead — nothing recreates it.",tip:true},
+  {t:"ReplicaSet maintains desired pod count; Deployment adds rolling updates and rollback on top."},
+  {t:"A Deployment does not create pods directly — it manages ReplicaSets which manage pods.",tip:true}]},
+ {title:"Namespaces",facts:[
+  {t:"Virtual partitions: scope for names, RBAC, and resource quotas."},
+  {t:"Cluster-scoped (NOT namespaced): nodes, PersistentVolumes, namespaces, ClusterRoles.",tip:true},
+  {t:"Built-ins: <code>default</code>, <code>kube-system</code>, <code>kube-public</code>, <code>kube-node-lease</code>."}]},
+ {title:"Workload Types",facts:[
+  {t:"<b>Deployment</b> — stateless, interchangeable pods; rolling updates and rollback."},
+  {t:"<b>StatefulSet</b> — stable ordered names and stable per-pod storage (databases)."},
+  {t:"<b>DaemonSet</b> — one pod per node (logging, monitoring, networking agents)."},
+  {t:"<b>Job</b> — runs to completion; <b>CronJob</b> adds a schedule."}]},
+ {title:"Pod Patterns & Lifecycle",facts:[
+  {t:"<b>Sidecar</b> — helper container alongside the main one (logging, proxy)."},
+  {t:"<b>Init container</b> — runs to completion before the main container starts."},
+  {t:"Phases: Pending → Running → Succeeded / Failed / Unknown."},
+  {t:"<b>Liveness</b> probe fails → container is restarted."},
+  {t:"<b>Readiness</b> probe fails → pod removed from service endpoints."},
+  {t:"<b>Startup</b> probe holds the other probes off until a slow container finishes initializing."}]},
+ {title:"Scheduling & Placement",facts:[
+  {t:"Scheduler flow: filter (room, taints, selectors) → score → bind."},
+  {t:"If no node fits, the pod stays Pending.",tip:true},
+  {t:"Node selector = simple label match; affinity/anti-affinity = expressive rules."},
+  {t:"Taints and tolerations reserve nodes (e.g., GPU nodes)."},
+  {t:"<b>Request</b> = guaranteed minimum, used by the scheduler for placement. <b>Limit</b> = enforced ceiling."},
+  {t:"CPU over limit → throttled. Memory over limit → container killed (OOM).",tip:true}]}
+]},
+{name:"Container Orchestration — 28%",sections:[
+ {title:"Networking Rules",facts:[
+  {t:"Every pod gets a unique IP; all pods reach all pods without NAT."},
+  {t:"Pod IPs are ephemeral — never hard-code them; always use a Service."},
+  {t:"CoreDNS: services resolve at <code>&lt;service&gt;.&lt;namespace&gt;.svc.cluster.local</code>."}]},
+ {title:"Service Types",facts:[
+  {t:"<b>ClusterIP</b> — internal only; the default."},
+  {t:"<b>NodePort</b> — opens the same fixed port on every node; dev/test/bare metal; a security concern."},
+  {t:"<b>LoadBalancer</b> — provisions an external cloud load balancer; the production standard."},
+  {t:"<b>ExternalName</b> — DNS CNAME alias; no proxying."},
+  {t:"Each type builds on the previous: NodePort includes ClusterIP; LoadBalancer includes NodePort."}]},
+ {title:"Ingress",facts:[
+  {t:"HTTP/HTTPS host- and path-based routing with TLS termination; many services behind one entry point."},
+  {t:"Requires an ingress controller (nginx, Traefik) to implement the rules.",tip:true},
+  {t:"The ingress controller itself is typically fronted by a LoadBalancer service."},
+  {t:"LoadBalancer exposes one service at L4; Ingress defines HTTP/HTTPS routing rules.",tip:true}]},
+ {title:"NetworkPolicy",facts:[
+  {t:"Pods communicate freely by default; NetworkPolicy restricts ingress/egress by labels, namespaces, and ports."},
+  {t:"Provides pod-level microsegmentation — zero-trust controls."},
+  {t:"Enforcement requires a supporting CNI: Cilium or Calico. Flannel does NOT enforce NetworkPolicy.",tip:true}]},
+ {title:"Storage",facts:[
+  {t:"Container filesystems are ephemeral — data is lost when the container stops."},
+  {t:"<b>PV</b> — storage in the cluster with a lifecycle independent of any pod."},
+  {t:"<b>PVC</b> — a request for storage (size + access mode) that binds to a matching PV."},
+  {t:"<b>StorageClass</b> — defines a storage tier and enables dynamic PV provisioning."},
+  {t:"<b>CSI</b> — vendor-agnostic plugin standard: PVs, PVCs, StorageClasses, dynamic provisioning, snapshots, volume resizing."},
+  {t:"Access modes: <b>RWO</b> read/write one node · <b>ROX</b> read-only many · <b>RWX</b> read/write many."}]},
+ {title:"The 3 Pluggable Interfaces",facts:[
+  {t:"<b>CRI</b> (Container Runtime Interface) — kubelet talks to a runtime: containerd, CRI-O."},
+  {t:"<b>CNI</b> (Container Network Interface) — configures pod networking: Cilium, Calico, Flannel."},
+  {t:"<b>CSI</b> (Container Storage Interface) — connects Kubernetes to back-end storage: vendor drivers."},
+  {t:"<b>OCI</b> — standards for image format and runtime behavior; enables portability."},
+  {t:"<b>runc</b> — low-level OCI runtime; containerd and CRI-O use it underneath."},
+  {t:"dockershim was removed in v1.24 — use CRI runtimes. Docker-built images still run.",tip:true}]},
+ {title:"Auto-Scaling",facts:[
+  {t:"<b>HPA</b> — scales out: adjusts replica count."},
+  {t:"<b>VPA</b> — scales up: increases resources per pod."},
+  {t:"<b>Cluster Autoscaler</b> — adds or removes nodes."},
+  {t:"<b>KEDA</b> — event-driven autoscaling; can scale to zero."},
+  {t:"No metrics pipeline → no autoscaling.",tip:true}]},
+ {title:"Security",facts:[
+  {t:"4 Cs, outside → in: Cloud → Cluster → Container → Code. Inner layers depend on outer layers."},
+  {t:"API flow: Authentication (who are you?) → Authorization (allowed?) → Admission control (validate/mutate) → etcd (persist)."},
+  {t:"<b>Role</b> = permissions in one namespace; <b>ClusterRole</b> = cluster-wide."},
+  {t:"<b>RoleBinding</b> grants a Role in a namespace; <b>ClusterRoleBinding</b> grants cluster-wide."},
+  {t:"<b>ServiceAccounts</b> — workload identities for processes in pods. Principle: least privilege."},
+  {t:"<b>ConfigMap</b> — non-sensitive config, injected as env vars or mounted files."},
+  {t:"<b>Secret</b> — base64 encoded, NOT encrypted. Real protection: RBAC + encryption at rest in etcd.",tip:true},
+  {t:"Never bake secrets into images — inject at runtime."},
+  {t:"Container hygiene: minimal base images, run as non-root, scan images, trusted registries + signing, least privilege."},
+  {t:"<b>OPA Gatekeeper</b> — policy engine enforcing rules through admission control."}]}
+]},
+{name:"App Delivery — 16%",sections:[
+ {title:"kubectl Essentials",facts:[
+  {t:"<code>kubectl get pods</code> · <code>kubectl get nodes</code> · <code>kubectl describe pod &lt;name&gt;</code>"},
+  {t:"<code>kubectl config current-context</code> · <code>get-contexts</code> · <code>use-context &lt;name&gt;</code>"},
+  {t:"Always pass <code>-n &lt;namespace&gt;</code> — never rely on the default.",tip:true},
+  {t:"Know how to deploy an app in a namespace (naming the app, defining the image)."},
+  {t:"Know how to update a pod's image without a full restart."}]},
+ {title:"Helm",facts:[
+  {t:"Deploying, upgrading, and removing charts."},
+  {t:"Post-exam intel: Helm was heavier than anticipated — drill it.",tip:true}]},
+ {title:"Service Mesh",facts:[
+  {t:"Adds mTLS, traffic management, retries, timeouts, circuit breaking, metrics, and tracing — with no application-code changes."},
+  {t:"Know <b>Istio</b> and <b>Linkerd</b>."},
+  {t:"Traefik is primarily an ingress/API gateway; Traefik Mesh is the mesh product.",tip:true},
+  {t:"Traefik Mesh uses node-level proxy endpoints, not the classic sidecar model."}]},
+ {title:"Serverless",facts:[
+  {t:"Run code without managing servers; platform handles scaling including scale-to-zero; usage-based charging."},
+  {t:"<b>Knative</b> — Kubernetes serverless: request scaling, scale-to-zero, eventing."},
+  {t:"<b>CloudEvents</b> — CNCF spec for a common event data format; enables serverless interoperability."}]}
+]},
+{name:"Cloud Native Architecture — 12%",sections:[
+ {title:"Definition & Principles",facts:[
+  {t:"Scalable apps across public, private, and hybrid clouds using containers, microservices, immutable infrastructure, declarative APIs, and automation."},
+  {t:"Goals: resilience, manageability, observability, and frequent predictable change."},
+  {t:"<b>Immutable infrastructure</b> — replace with a new version; never patch in place."},
+  {t:"<b>Declarative APIs</b> — describe the desired end state; the system converges."},
+  {t:"<b>Loose coupling</b> — defined APIs let services change independently."},
+  {t:"Automate build, test, and deploy pipelines."}]},
+ {title:"Monolith vs Microservices",facts:[
+  {t:"Monolith: one large unit; deploy and scale together; simple initially, hard to grow."},
+  {t:"Microservices: small, independently deployable, communicating via APIs; per-service scaling and failure isolation; more operational complexity."}]},
+ {title:"12-Factor Highlights",facts:[
+  {t:"Store configuration in the environment."},
+  {t:"Treat backing services as attached resources."},
+  {t:"Separate build / release / run stages."},
+  {t:"Run apps as stateless processes."},
+  {t:"Treat logs as streams."}]},
+ {title:"CNCF",facts:[
+  {t:"Part of the Linux Foundation; a neutral home for cloud-native open-source projects."},
+  {t:"Maturity ladder: Sandbox → Incubating → Graduated."},
+  {t:"Graduated projects: Kubernetes, Prometheus, Envoy, containerd, Helm, Argo, Cilium, Fluentd."},
+  {t:"<b>TOC</b> guides technical direction; the <b>Governing Board</b> handles business and budget."}]},
+ {title:"Open Standards",facts:[
+  {t:"OCI images/runtime · CRI runtime · CNI network · CSI storage · SMI service mesh."},
+  {t:"<b>OpenTelemetry</b> — vendor-neutral metrics, logs, and traces."},
+  {t:"<b>CloudEvents</b> — common event-data format."}]},
+ {title:"Observability & Reliability",facts:[
+  {t:"<b>SLI</b> — a measurement, e.g. actual request latency."},
+  {t:"<b>SLO</b> — an internal target, e.g. 99.9% of requests under 200 ms."},
+  {t:"<b>SLA</b> — a customer contract, with consequences if missed."},
+  {t:"Prometheus metric types: counter, gauge, histogram."}]},
+ {title:"Key Roles",facts:[
+  {t:"<b>DevOps</b> — bridges dev and ops; automates CI/CD pipelines."},
+  {t:"<b>SRE</b> — software engineering applied to operations; reliability, reducing toil."},
+  {t:"<b>Platform Engineer</b> — internal self-service platforms and tooling."},
+  {t:"<b>DevSecOps</b> — security through the whole development lifecycle."},
+  {t:"<b>FinOps</b> — financial accountability for cloud spending."}]}
+]}
+];
+
+const CARDS = [
+["Which component is the ONLY one that talks directly to etcd?","The API server."],
+["A bare pod (no controller) dies. What happens?","Nothing recreates it — it stays dead. Only controllers (ReplicaSets, etc.) recreate pods."],
+["What does a Deployment actually create?","ReplicaSets. The ReplicaSet creates the pods. Deployment → ReplicaSet → Pod."],
+["Liveness probe fails vs readiness probe fails — the difference?","Liveness fails → container restarted. Readiness fails → pod removed from service endpoints."],
+["Container exceeds its CPU limit. Its memory limit. What happens in each case?","CPU → throttled. Memory → killed (OOM)."],
+["Name four cluster-scoped (non-namespaced) objects.","Nodes, PersistentVolumes, Namespaces, ClusterRoles."],
+["Which workload type runs exactly one pod per node?","DaemonSet — logging, monitoring, and networking agents."],
+["Databases needing stable names and per-pod storage — which workload type?","StatefulSet."],
+["Init container vs sidecar?","Init runs to completion BEFORE the main container starts; a sidecar runs alongside it."],
+["Scheduler's three-step flow?","Filter → score → bind. No fitting node → pod stays Pending."],
+["Request vs limit?","Request = guaranteed minimum (used for placement). Limit = enforced ceiling."],
+["Full cluster DNS name for a service?","<service>.<namespace>.svc.cluster.local"],
+["The four Service types?","ClusterIP (internal, default), NodePort (fixed port on every node), LoadBalancer (external cloud LB), ExternalName (DNS CNAME)."],
+["NodePort vs LoadBalancer in one line?","NodePort opens a door on every node; LoadBalancer is one receptionist in front of the whole app."],
+["What does an Ingress need before it does anything?","An ingress controller (nginx, Traefik) — usually fronted by a LoadBalancer service."],
+["LoadBalancer vs Ingress?","LoadBalancer exposes ONE service at L4; Ingress defines HTTP/HTTPS routing rules for many services."],
+["Which CNIs enforce NetworkPolicy — and which famously doesn't?","Cilium and Calico enforce. Flannel does NOT."],
+["PV, PVC, StorageClass in one metaphor?","PVC = claim ticket, PV = the disk, StorageClass = the catalog that makes disks on demand."],
+["Access modes RWO / ROX / RWX?","RWO: read-write one node. ROX: read-only many nodes. RWX: read-write many nodes."],
+["CRI, CNI, CSI — the mnemonic?","CRI runs, CNI connects, CSI stores."],
+["What happened in Kubernetes v1.24?","dockershim was removed. Use containerd or CRI-O; Docker-built images still run."],
+["What is runc?","The low-level OCI runtime that containerd and CRI-O use underneath."],
+["HPA vs VPA vs Cluster Autoscaler vs KEDA?","HPA scales out (replicas), VPA scales up (resources per pod), Cluster Autoscaler adds/removes nodes, KEDA is event-driven and scales to zero."],
+["The 4 Cs of cloud-native security, outside in?","Cloud → Cluster → Container → Code."],
+["API request security flow?","Authentication → Authorization → Admission Control → etcd."],
+["Role vs ClusterRole vs the bindings?","Role = namespace permissions, ClusterRole = cluster-wide. Bindings grant them: RoleBinding in a namespace, ClusterRoleBinding cluster-wide. Role defines; Binding grants."],
+["Are Kubernetes Secrets encrypted?","No — base64 encoded, NOT encrypted. Real protection = RBAC + encryption at rest in etcd."],
+["What is OPA Gatekeeper?","A policy engine that enforces rules through admission control."],
+["What does a service mesh add, and to what layer?","mTLS, traffic management, retries, timeouts, circuit breaking, metrics, tracing — without application code changes. Know Istio and Linkerd."],
+["Knative and CloudEvents?","Knative = Kubernetes serverless (request scaling, scale-to-zero, eventing). CloudEvents = CNCF common event format for interoperability."],
+["CNCF project maturity ladder?","Sandbox → Incubating → Graduated."],
+["Name five CNCF graduated projects.","Kubernetes, Prometheus, Envoy, containerd, Helm (also Argo, Cilium, Fluentd)."],
+["SLI vs SLO vs SLA?","SLI measures (actual latency), SLO is the internal target (99.9% < 200ms), SLA is the customer contract with consequences."],
+["Three Prometheus metric types?","Counter, gauge, histogram."],
+["Immutable infrastructure means…?","Replace with a new version — never patch in place."],
+["The exam's four domains and weights?","Kubernetes Fundamentals 44%, Container Orchestration 28%, App Delivery 16%, Cloud Native Architecture 12%."]
+];
+
+/* ================= MODE SWITCHING ================= */
+const tabs=document.querySelectorAll('.tab');
+tabs.forEach(t=>t.addEventListener('click',()=>{
+  tabs.forEach(x=>x.classList.toggle('active',x===t));
+  ['cram','chart','drill'].forEach(m=>document.getElementById('mode-'+m).classList.toggle('hidden',m!==t.dataset.mode));
+  window.scrollTo({top:0});
+}));
+
+/* ================= CRAM ================= */
+document.getElementById('hooks').innerHTML=HOOKS.map(h=>`<div class="hook">${h}</div>`).join('');
+document.getElementById('warnings').innerHTML=WARNINGS.map(([k,v])=>`<div class="warning"><span class="wtag">⚠ ${k}</span>${v}</div>`).join('');
+
+/* ================= CHART ================= */
+const chartBody=document.getElementById('chart-body');
+const jumps=document.getElementById('jumps');
+function renderChart(filter=''){
+  const f=filter.trim().toLowerCase();
+  let html='',any=false;
+  DOMAINS.forEach((d,di)=>{
+    let dHtml='';
+    d.sections.forEach(s=>{
+      const facts=s.facts.filter(x=>!f||x.t.toLowerCase().includes(f)||s.title.toLowerCase().includes(f));
+      if(!facts.length)return;
+      any=true;
+      const open=f?' open':'';
+      dHtml+=`<div class="section${open}">
+        <button class="section-head" aria-expanded="${!!f}">
+          <svg class="chev" width="12" height="12" viewBox="0 0 12 12"><path d="M3 1l6 5-6 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          <h3>${s.title}</h3><span class="count">${facts.length} fact${facts.length>1?'s':''}</span>
+        </button>
+        <div class="facts">${facts.map(x=>{
+          let t=x.t;
+          if(f){const re=new RegExp('('+f.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+            t=t.replace(/>([^<]+)</g,(m,txt)=>'>'+txt.replace(re,'<mark>$1</mark>')+'<');
+            if(!/[<>]/.test(x.t))t=x.t.replace(re,'<mark>$1</mark>');}
+          return `<div class="fact${x.tip?' tip':''}">${x.tip?'<span class="wtag">⚠ exam trap</span>':''}${t}</div>`;
+        }).join('')}</div>
+      </div>`;
+    });
+    if(dHtml)html+=`<div id="dom-${di}"><span class="domain-band">${d.name}</span>${dHtml}</div>`;
+  });
+  chartBody.innerHTML=any?html:'<div class="noresults">Nothing on the chart matches that bearing. Try another term.</div>';
+  chartBody.querySelectorAll('.section-head').forEach(h=>h.addEventListener('click',()=>{
+    const sec=h.parentElement;sec.classList.toggle('open');
+    h.setAttribute('aria-expanded',sec.classList.contains('open'));
+  }));
+}
+jumps.innerHTML=DOMAINS.map((d,i)=>`<button class="jump" data-i="${i}">${d.name.split('—')[0].trim()}</button>`).join('');
+jumps.querySelectorAll('.jump').forEach(b=>b.addEventListener('click',()=>{
+  const el=document.getElementById('dom-'+b.dataset.i);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+}));
+document.getElementById('search').addEventListener('input',e=>renderChart(e.target.value));
+renderChart();
+
+/* ================= DRILL ================= */
+let deck=[],idx=0,known=0;
+const flip=document.getElementById('cardflip'),
+      qT=document.getElementById('q-text'),aT=document.getElementById('a-text'),
+      cnt=document.getElementById('drill-count'),kn=document.getElementById('drill-known'),
+      bar=document.getElementById('drill-bar'),
+      wrap=document.getElementById('drill-card-wrap'),done=document.getElementById('drill-done');
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function startDeck(){deck=shuffle(CARDS.map((c,i)=>i));idx=0;known=0;wrap.classList.remove('hidden');done.classList.add('hidden');show();}
+function show(){
+  if(!deck.length){wrap.classList.add('hidden');done.classList.remove('hidden');return;}
+  if(idx>=deck.length)idx=0;
+  flip.classList.remove('flipped');
+  const c=CARDS[deck[idx]];
+  qT.textContent=c[0];aT.textContent=c[1];
+  cnt.textContent=`Card ${idx+1} / ${deck.length}`;
+  kn.textContent=`${known} known`;
+  bar.style.width=(known/CARDS.length*100)+'%';
+}
+flip.addEventListener('click',()=>flip.classList.toggle('flipped'));
+flip.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();flip.classList.toggle('flipped');}});
+document.getElementById('btn-got').addEventListener('click',()=>{deck.splice(idx,1);known++;show();});
+document.getElementById('btn-again').addEventListener('click',()=>{idx++;show();});
+document.getElementById('btn-shuffle').addEventListener('click',()=>{shuffle(deck);idx=0;show();});
+document.getElementById('btn-restart').addEventListener('click',startDeck);
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('mode-drill').classList.contains('hidden'))return;
+  if(e.target.tagName==='INPUT')return;
+  if(e.key==='ArrowRight'){idx++;show();}
+});
+startDeck();
+</script>
+</body>
+</html>
